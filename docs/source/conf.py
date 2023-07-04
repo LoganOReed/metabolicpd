@@ -20,7 +20,8 @@ author = 'Logan Reed, Chris Denaro'
 extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.napoleon',
               'sphinx.ext.intersphinx',
-              'sphinx.ext.todo']
+              'sphinx.ext.todo',
+              'sphinx.ext.githubpages']
 
 templates_path = ['_templates']
 exclude_patterns = []
