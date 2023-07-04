@@ -33,6 +33,7 @@ def function_with_types_in_docstring(param1, param2):
 
     """
 
+
 class ExampleClass(object):
     """The summary line for a class docstring should fit on one line.
 
@@ -74,7 +75,7 @@ class ExampleClass(object):
         self.attr3 = param3  #: Doc comment *inline* with attribute
 
         #: list of str: Doc comment *before* attribute, with type specified
-        self.attr4 = ['attr4']
+        self.attr4 = ["attr4"]
 
         self.attr5 = None
         """str: Docstring *after* attribute, with type specified."""
@@ -82,17 +83,16 @@ class ExampleClass(object):
     @property
     def readonly_property(self):
         """str: Properties should be documented in their getter method."""
-        return 'readonly_property'
+        return "readonly_property"
 
     @property
     def readwrite_property(self):
-        """:obj:`list` of :obj:`str`: Properties with both a getter and setter
-        should only be documented in their getter method.
+        """:obj:`list` of :obj:`str`: Properties with both a getter and setter should only be documented in their getter method.
 
         If the setter method contains notable behavior, it should be
         mentioned here.
         """
-        return ['readwrite_property']
+        return ["readwrite_property"]
 
     @readwrite_property.setter
     def readwrite_property(self, value):

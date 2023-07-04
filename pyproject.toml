@@ -24,6 +24,24 @@ codetiming = "^1.4.0"
 sphinx = "<7"
 sphinx-rtd-theme = "^1.2.2"
 
+
+[tool.poetry.group.dev.dependencies]
+flake8 = "^6.0.0"
+black = "^23.3.0"
+pre-commit = "^3.3.3"
+pydocstyle = "^6.3.0"
+isort = "^5.12.0"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 88
+
+[tool.isort]
+profile = "black"
+
+[tool.pydocstyle]
+convention = "google"
+add-ignore = "D100,D101,D102,D103,D104,D105,D106,D107"

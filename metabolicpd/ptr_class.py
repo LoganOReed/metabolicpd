@@ -1,7 +1,6 @@
 # Used by "import_matrix"
 
 
-
 class Pointer_like:
     def __init__(self, obj):
         self.obj = obj
@@ -57,9 +56,9 @@ class Pointer_like:
         return self.get()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # demonstrating of desired behavior
-    x_ptr = [Pointer_like(i) for i in range(0,10)]
+    x_ptr = [Pointer_like(i) for i in range(0, 10)]
     zero_ptr = Pointer_like(0)
 
     depending_array = [zero_ptr, zero_ptr, x_ptr[4], zero_ptr, x_ptr[9]]
