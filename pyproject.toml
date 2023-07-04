@@ -1,0 +1,29 @@
+[tool.poetry]
+name = "metabolicpd"
+version = "0.1.0"
+description = ""
+authors = ["Logan Reed <me@loganreed.org>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.11,<3.13"
+matplotlib = "^3.7.1"
+cycler = "^0.11.0"
+numpy = "^1.25.0"
+pandas = "^2.0.3"
+openpyxl = "^3.1.2"
+sympy = "^1.12"
+scipy = "^1.11.1"
+
+
+[tool.poetry.group.test.dependencies]
+codetiming = "^1.4.0"
+
+
+[tool.poetry.group.docs.dependencies]
+sphinx = "<7"
+sphinx-rtd-theme = "^1.2.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
