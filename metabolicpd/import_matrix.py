@@ -3,7 +3,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from ptr_class import Pointer_like
 
 
 class LIFE_Matrix:
@@ -34,7 +33,7 @@ class LIFE_Matrix:
 
     def generate_x_array(self):
         num_nodes = len(self.node_names)
-        zero_ptr = Pointer_like(0)
+        zero_ptr = 0
         x_array_ptr = [zero_ptr for ele in range(0, num_nodes)]
         return x_array_ptr
 
@@ -97,11 +96,11 @@ class LIFE_Matrix:
 
 
 def K_p(x):
-    return Pointer_like(1)
+    return 1
 
 
 def K_m(x):
-    return Pointer_like(1)
+    return 1
 
 
 def F(x):
@@ -109,8 +108,8 @@ def F(x):
 
 
 def define_matrix_by_hand():
-    x = [Pointer_like(1) for i in range(0, 20)]
-    neg_one_ptr = Pointer_like(-1)
+    x = [1 for i in range(0, 20)]
+    neg_one_ptr = -1
     r_0 = [
         1.0,
         0.0,
@@ -595,8 +594,8 @@ def define_matrix_by_hand():
     ]
     for i in range(0, len(s_list)):
         for j in range(0, len(s_list[0])):
-            if type(s_list[i][j]) != Pointer_like:
-                s_list[i][j] = Pointer_like(s_list[i][j])
+            if type(s_list[i][j]) != float:
+                s_list[i][j] = float(s_list[i][j])
     s_matrix = np.array(s_list)
     return s_matrix
 
@@ -610,11 +609,10 @@ if __name__ == "__main__":
     np.random.seed(0)
     vals = np.random.uniform(low=0.2, high=0.7, size=20)
 
-    x = [Pointer_like(ele) for ele in np.random.rand(20)]
-    # x = [Pointer_like(1), Pointer_like(0.5), Pointer_like(0.2), Pointer_like(0.4), Pointer_like(0.8), Pointer_like(0.2), Pointer_like(0.11), Pointer_like(1), Pointer_like(1), Pointer_like(1), Pointer_like(1), Pointer_like(1), Pointer_like(1), Pointer_like(1), Pointer_like(1), Pointer_like(1), Pointer_like(1), Pointer_like(1), Pointer_like(1), Pointer_like(1)]
-    zero_ptr = Pointer_like(0)
-    one_ptr = Pointer_like(1)
-    neg_one_ptr = Pointer_like(-1)
+    x = [ele for ele in np.random.rand(20)]
+    zero_ptr = 0.0
+    one_ptr = 1.0
+    neg_one_ptr = -1.0
     # r_0 = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, neg_one_ptr * x[0] * K_p(x[6]),
     #        neg_one_ptr * x[0] * K_p(x[2]) * K_p(x[3]) * K_p(x[4]), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
     #        0.0, 0.0, 0.0]
@@ -1129,7 +1127,7 @@ if __name__ == "__main__":
         ]
     )
 
-    flux_ptr = np.array([Pointer_like(1)] * 21)
+    flux_ptr = np.array([1.0] * 21)
 
     t_current = 0
     t_step = 0.1
@@ -1137,9 +1135,9 @@ if __name__ == "__main__":
     t_array = [t_current]
 
     num_values = 10
-    values = [[ele.get() for ele in x[0:num_values]]]
+    values = [[ele for ele in x[0:num_values]]]
 
-    t_step_ptr = Pointer_like(t_step)
+    t_step_ptr = t_step
 
     while t_current < t_final:
         # print("######################################")
@@ -1156,14 +1154,14 @@ if __name__ == "__main__":
 
         # update x:
         for i in range(0, len(integration_step)):
-            x[i].set(integration_step[i].get())
+            x[i] = integration_step[i]
 
         t_current += t_step
         t_array.append(t_current)
-        values.append([ele.get() for ele in x[0:num_values]])
+        values.append([ele for ele in x[0:num_values]])
 
         # print('x_ptr values after update:', [ele.get() for ele in x])
-        print("s_values:", [[item.get() for item in ele] for ele in stoich_matrix_ptr])
+        print("s_values:", [[item for item in ele] for ele in stoich_matrix_ptr])
 
     plt.plot(t_array, values, label=node_names[0:num_values])
     plt.legend(loc="lower left")
