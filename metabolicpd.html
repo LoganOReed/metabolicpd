@@ -271,8 +271,7 @@ in the property’s getter method.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="metabolicpd.example_docs.ExampleClass.readwrite_property">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">readwrite_property</span></span><a class="headerlink" href="#metabolicpd.example_docs.ExampleClass.readwrite_property" title="Permalink to this definition"></a></dt>
-<dd><p>Properties with both a getter and setter
-should only be documented in their getter method.</p>
+<dd><p>Properties with both a getter and setter should only be documented in their getter method.</p>
 <p>If the setter method contains notable behavior, it should be
 mentioned here.</p>
 <dl class="field-list simple">
@@ -418,7 +417,7 @@ on the first line, separated by a colon.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="metabolicpd.read_and_plot.Data_Reader.overlapping_plot_results_of_interest">
 <span class="sig-name descname"><span class="pre">overlapping_plot_results_of_interest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">existing_ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_modifier</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linestyle</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#metabolicpd.read_and_plot.Data_Reader.overlapping_plot_results_of_interest" title="Permalink to this definition"></a></dt>
-<dd><p>Plots the results of the simulation for a subset of metabolites</p>
+<dd><p>Plots the results of the simulation for a subset of metabolites.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -440,7 +439,7 @@ on the first line, separated by a colon.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="metabolicpd.read_and_plot.Data_Reader.plot_results_of_interest">
 <span class="sig-name descname"><span class="pre">plot_results_of_interest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label_modifier</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#metabolicpd.read_and_plot.Data_Reader.plot_results_of_interest" title="Permalink to this definition"></a></dt>
-<dd><p>Plots the results of the simulation for a subset of metabolites</p>
+<dd><p>Plots the results of the simulation for a subset of metabolites.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -516,7 +515,7 @@ matrix and metabolites in the network corresponding to the rows of the matrix.</
 <dl class="py method">
 <dt class="sig sig-object py" id="metabolicpd.simulator.LIFE_Simulator.create_flux">
 <span class="sig-name descname"><span class="pre">create_flux</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#metabolicpd.simulator.LIFE_Simulator.create_flux" title="Permalink to this definition"></a></dt>
-<dd><p>Creates numeric and symbolic variables for flux according to number of edges in network</p>
+<dd><p>Creates numeric and symbolic variables for flux according to number of edges in network.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>list of all 1s
@@ -545,7 +544,7 @@ sym_flux: sympy Matrix of all 1s</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="metabolicpd.simulator.LIFE_Simulator.create_symbolic_meta_array">
 <span class="sig-name descname"><span class="pre">create_symbolic_meta_array</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#metabolicpd.simulator.LIFE_Simulator.create_symbolic_meta_array" title="Permalink to this definition"></a></dt>
-<dd><p>Creates a list that holds Sympy symbols with variable names from actual_meta_lookup</p>
+<dd><p>Creates a list that holds Sympy symbols with variable names from actual_meta_lookup.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>actual_meta_lookup</strong> – a python dictionary with keys being actual metabolites within network and values being
@@ -563,7 +562,7 @@ indices of the corresponding key</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="metabolicpd.simulator.LIFE_Simulator.create_value_array">
 <span class="sig-name descname"><span class="pre">create_value_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rng_seed</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#metabolicpd.simulator.LIFE_Simulator.create_value_array" title="Permalink to this definition"></a></dt>
-<dd><p>Creates a numeric array based on number of actual metabolites</p>
+<dd><p>Creates a numeric array based on number of actual metabolites.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>sym_array</strong> – a list of Sympy symbols that correspond to metabolites in network</p>
@@ -597,7 +596,7 @@ indices of the corresponding key</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="metabolicpd.simulator.LIFE_Simulator.extract_uni_names">
 <span class="sig-name descname"><span class="pre">extract_uni_names</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">net_df</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#metabolicpd.simulator.LIFE_Simulator.extract_uni_names" title="Permalink to this definition"></a></dt>
-<dd><p>Extracts the unique names within the network dataframe</p>
+<dd><p>Extracts the unique names within the network dataframe.</p>
 <p>This function simply return all the unique names from an edge list
 held in a pandas dataframe. If an entry in the df has multiple string (separated
 by a comma and space: “, “), then it splits the entry.</p>
@@ -634,7 +633,7 @@ actual_meta_list : A pyhton list that holds actual metabolites within the networ
 <dl class="py method">
 <dt class="sig sig-object py" id="metabolicpd.simulator.LIFE_Simulator.plot_results_of_interest">
 <span class="sig-name descname"><span class="pre">plot_results_of_interest</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#metabolicpd.simulator.LIFE_Simulator.plot_results_of_interest" title="Permalink to this definition"></a></dt>
-<dd><p>Plots the results of the simulation for a subset of metabolites</p>
+<dd><p>Plots the results of the simulation for a subset of metabolites.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -693,7 +692,7 @@ actual_meta_list : A pyhton list that holds actual metabolites within the networ
 <dl class="py function">
 <dt class="sig sig-object py" id="metabolicpd.simulator.metabolites_func_to_int">
 <span class="sig-prename descclassname"><span class="pre">metabolicpd.simulator.</span></span><span class="sig-name descname"><span class="pre">metabolites_func_to_int</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sym_matrix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sym_flux</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sym_metabolites</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#metabolicpd.simulator.metabolites_func_to_int" title="Permalink to this definition"></a></dt>
-<dd><p>Function to facilitate scipy.odeint runge-kutta integration with specified metabolite values</p>
+<dd><p>Function to facilitate scipy.odeint runge-kutta integration with specified metabolite values.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -718,7 +717,7 @@ actual_meta_list : A pyhton list that holds actual metabolites within the networ
 <dl class="py function">
 <dt class="sig sig-object py" id="metabolicpd.simulator.specific_metabolites_func_to_int">
 <span class="sig-prename descclassname"><span class="pre">metabolicpd.simulator.</span></span><span class="sig-name descname"><span class="pre">specific_metabolites_func_to_int</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sym_matrix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sym_flux</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sym_metabolites</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indices_of_fixed_meta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">values_of_fixed_meta</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#metabolicpd.simulator.specific_metabolites_func_to_int" title="Permalink to this definition"></a></dt>
-<dd><p>Function to facilitate scipy.odeint runge-kutta integration with specified metabolite values</p>
+<dd><p>Function to facilitate scipy.odeint runge-kutta integration with specified metabolite values.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -785,7 +784,7 @@ matrix and metabolites in the network corresponding to the rows of the matrix.</
 <dl class="py function">
 <dt class="sig sig-object py" id="metabolicpd.symbolic_approach.create_symbolic_meta_array">
 <span class="sig-prename descclassname"><span class="pre">metabolicpd.symbolic_approach.</span></span><span class="sig-name descname"><span class="pre">create_symbolic_meta_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">actual_meta_lookup</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#metabolicpd.symbolic_approach.create_symbolic_meta_array" title="Permalink to this definition"></a></dt>
-<dd><p>Creates a list that holds Sympy symbols with variable names from actual_meta_lookup</p>
+<dd><p>Creates a list that holds Sympy symbols with variable names from actual_meta_lookup.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>actual_meta_lookup</strong> – a python dictionary with keys being actual metabolites within network and values being
@@ -803,7 +802,7 @@ indices of the corresponding key</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="metabolicpd.symbolic_approach.create_value_array">
 <span class="sig-prename descclassname"><span class="pre">metabolicpd.symbolic_approach.</span></span><span class="sig-name descname"><span class="pre">create_value_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sym_array</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#metabolicpd.symbolic_approach.create_value_array" title="Permalink to this definition"></a></dt>
-<dd><p>Creates a numeric array based on number of actual metabolites</p>
+<dd><p>Creates a numeric array based on number of actual metabolites.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>sym_array</strong> – a list of Sympy symbols that correspond to metabolites in network</p>
@@ -862,7 +861,7 @@ meta_value_array: the calculated trajectory of mass for each metabolite within t
 <dl class="py function">
 <dt class="sig sig-object py" id="metabolicpd.symbolic_approach.extract_metabolites">
 <span class="sig-prename descclassname"><span class="pre">metabolicpd.symbolic_approach.</span></span><span class="sig-name descname"><span class="pre">extract_metabolites</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network_df</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#metabolicpd.symbolic_approach.extract_metabolites" title="Permalink to this definition"></a></dt>
-<dd><p>Extracts the unique names within the network dataframe</p>
+<dd><p>Extracts the unique names within the network dataframe.</p>
 <p>This function simply return all the unique names from an edge list
 held in a pandas dataframe. If an entry in the df has multiple string (separated
 by a comma and space: “, “), then it splits the entry.</p>
@@ -899,7 +898,7 @@ actual_meta_list : A pyhton list that holds actual metabolites within the networ
 <dl class="py function">
 <dt class="sig sig-object py" id="metabolicpd.symbolic_approach.func_to_int">
 <span class="sig-prename descclassname"><span class="pre">metabolicpd.symbolic_approach.</span></span><span class="sig-name descname"><span class="pre">func_to_int</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sym_matrix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sym_flux</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sym_metabolites</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#metabolicpd.symbolic_approach.func_to_int" title="Permalink to this definition"></a></dt>
-<dd><p>Function to facilitate scipy.odeint runge-kutta integration</p>
+<dd><p>Function to facilitate scipy.odeint runge-kutta integration.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -949,7 +948,7 @@ meta_value_array: the calculated trajectory of mass for each metabolite within t
 <dl class="py function">
 <dt class="sig sig-object py" id="metabolicpd.symbolic_approach.plot_results_of_interest">
 <span class="sig-prename descclassname"><span class="pre">metabolicpd.symbolic_approach.</span></span><span class="sig-name descname"><span class="pre">plot_results_of_interest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">meta_of_interest</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actual_lookup</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#metabolicpd.symbolic_approach.plot_results_of_interest" title="Permalink to this definition"></a></dt>
-<dd><p>Plots the results of the simulation for a subset of metabolites</p>
+<dd><p>Plots the results of the simulation for a subset of metabolites.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -971,7 +970,7 @@ meta_value_array: the calculated trajectory of mass for each metabolite within t
 <dl class="py function">
 <dt class="sig sig-object py" id="metabolicpd.symbolic_approach.specific_metabolites_func_to_int">
 <span class="sig-prename descclassname"><span class="pre">metabolicpd.symbolic_approach.</span></span><span class="sig-name descname"><span class="pre">specific_metabolites_func_to_int</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sym_matrix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sym_flux</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sym_metabolites</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indices_of_fixed_meta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">values_of_fixed_meta</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#metabolicpd.symbolic_approach.specific_metabolites_func_to_int" title="Permalink to this definition"></a></dt>
-<dd><p>Function to facilitate scipy.odeint runge-kutta integration with specified metabolite values</p>
+<dd><p>Function to facilitate scipy.odeint runge-kutta integration with specified metabolite values.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
