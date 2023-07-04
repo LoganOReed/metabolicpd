@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from scipy.integrate import odeint
-from sympy import Matrix, Min, exp, symbols
+from sympy import Matrix, Min, exp
 
 
 def extract_metabolites(network_df):
@@ -31,6 +31,7 @@ def extract_metabolites(network_df):
     return new_unique_metabolites
 
 
+# TODO: Rewrite name and docstring. Just creates dictionary btw name and index
 def create_meta_lookup(unique_metabolite_list):
     """Creates a lookup dictionary that ties unique metabolite names to an index.
 
@@ -82,55 +83,55 @@ def find_source_sink_index(meta_lookup_dict):
     return source_sink_dict, actual_meta_list
 
 
-def create_symbolic_meta_array(actual_meta_lookup):
-    """Creates a list that holds Sympy symbols with variable names from actual_meta_lookup.
+def create_name_array(actual_meta_lookup):
+    """Creates a list that holds the variable names from actual_meta_lookup.
 
     Args:
         actual_meta_lookup : a python dictionary with keys being actual metabolites within network and values being
          indices of the corresponding key
 
     Returns:
-        symbolic_array : a list of Sympy symbols that come from the keys in actual_meta_lookup
+        name_array : a list of keys in actual_meta_lookup, corresponding to names of metabolites.
     """
-    symbolic_array = []
+    name_array = []
     for key in actual_meta_lookup.keys():
-        symbolic_array.append(symbols(key))
+        name_array.append(key)
 
-    return symbolic_array
+    return name_array
 
 
-def create_value_array(sym_array):
+def create_value_array(metabolite_names):
     """Creates a numeric array based on number of actual metabolites.
 
     Args:
-        sym_array: a list of Sympy symbols that correspond to metabolites in network
+        metabolite_names: a list of metabolites in network
 
     Returns:
         Numpy array of random values between 0, 1 that is in parallel with sym_array
     """
     np.random.seed(seed=12)
-    return np.random.rand(len(sym_array))
+    return np.random.rand(len(name_array))
 
 
-def create_S_matrix(net_df, actual_meta_lookup, sym_array):
+def create_S_matrix(net_df, actual_meta_lookup, name_array):
     """Create the 'S' matrix that defines the dynamics of a metabolic network.
 
     The form of the 'S' matrix comes follows LIFE dynamics, with edges in the network corresponding to columns in the
     matrix and metabolites in the network corresponding to the rows of the matrix.
 
-    The indices within actual_meta_lookup correspond to the indices of sym_array.
+    The indices within actual_meta_lookup correspond to the indices of name_array.
 
     Args:
         net_df: pandas dataframe of an edge list encoding the metabolic network
         actual_meta_lookup: python dictionary with keys as metabolites in network and values of indices
-        sym_array: python list of Sympy symbols corresponding to the metabolites in the network
+        name_array: python list of the metabolites in the network
 
     Returns:
         A list of lists with elements being sympy symbols that encodes the dynamics of the network according to the
             LIFE approach
     """
     # number of non-source/sink metabolites
-    num_metabolites = len(sym_array)  # the number of rows in the matrix
+    num_metabolites = len(name_array)  # the number of rows in the matrix
     # num_edges = len(
     #     net_df["tail"].values
     # )  # the number of cols in the matrix  -- this is unused
@@ -160,24 +161,20 @@ def create_S_matrix(net_df, actual_meta_lookup, sym_array):
             # index_of_uber_meta = actual_meta_lookup[uber_meta]
             # uber_symbol = sym_array[index_of_uber_meta]
             if uber[-1] == "+":  # check the last term in the entry, enhancer
-                uber_meta = uber[
-                    :-2
-                ]  # get all the characters, except the last two (either _+/-)
-                index_of_uber_meta = actual_meta_lookup[
-                    uber_meta
-                ]  # get the index of the uber metabolites
-                uber_symbol = sym_array[
-                    index_of_uber_meta
-                ]  # get the symbol of the uber metabolite
-                uber_term = uber_term * exp(
-                    (uber_symbol / (uber_symbol + 1))
-                )  # always greater than one
+                # get all the characters, except the last two (either _+/-)
+                uber_meta = uber[:-2]
+                # get the index of the uber metabolites
+                index_of_uber_meta = actual_meta_lookup[uber_meta]
+                # get the symbol of the uber metabolite
+                uber_symbol = name_array[index_of_uber_meta]
+                # always greater than one
+                uber_term = uber_term * exp((uber_symbol / (uber_symbol + 1)))
             elif uber[-1] == "-":  # if the last term designates an inhibitor
                 uber_meta = uber[
                     :-2
                 ]  # get all the characters, except the last two (either _+/-)
                 index_of_uber_meta = actual_meta_lookup[uber_meta]
-                uber_symbol = sym_array[index_of_uber_meta]
+                uber_symbol = name_array[index_of_uber_meta]
                 uber_term = (
                     uber_term * 1 / exp((uber_symbol / (uber_symbol + 1)))
                 )  # always less than one
@@ -195,7 +192,7 @@ def create_S_matrix(net_df, actual_meta_lookup, sym_array):
             # current_col[index_of_prods_in_meta] = min(sym_array[index_of_subs_in_meta])
 
             # build the term for the hyperedge min(substrates in the hyperedge)
-            terms_in_min = [sym_array[sub_idx] for sub_idx in index_of_subs_in_meta]
+            terms_in_min = [name_array[sub_idx] for sub_idx in index_of_subs_in_meta]
             expression = Min(*terms_in_min)
             for sub_index in index_of_subs_in_meta:
                 current_col[sub_index] = -1 * expression * uber_term
@@ -214,17 +211,17 @@ def create_S_matrix(net_df, actual_meta_lookup, sym_array):
             elif re.search("^[e]+[0-9]", products[0]) is not None:  # sink term
                 index_of_sub_in_meta = actual_meta_lookup[substrates[0]]
                 current_col[index_of_sub_in_meta] = (
-                    -1 * sym_array[index_of_sub_in_meta] * uber_term
+                    -1 * name_array[index_of_sub_in_meta] * uber_term
                 )
             else:  # not a source or sink
                 index_of_prod_in_meta = actual_meta_lookup[products[0]]
                 index_of_sub_in_meta = actual_meta_lookup[substrates[0]]
 
                 current_col[index_of_sub_in_meta] = (
-                    -1 * sym_array[index_of_sub_in_meta] * uber_term
+                    -1 * name_array[index_of_sub_in_meta] * uber_term
                 )
                 current_col[index_of_prod_in_meta] = (
-                    sym_array[index_of_sub_in_meta] * uber_term
+                    name_array[index_of_sub_in_meta] * uber_term
                 )
 
         s_matrix.append(current_col)
@@ -446,10 +443,10 @@ if __name__ == "__main__":
 
     actual_meta_lookup = create_meta_lookup(actual_meta)  # lookup without sources/sinks
 
-    # create the symbolic metabolite array and the value array
-    sym_array = create_symbolic_meta_array(actual_meta_lookup)
-    val_array = create_value_array(sym_array)
-    print("sym_array:", sym_array)
+    # create the metabolite array and the value array
+    name_array = create_name_array(actual_meta_lookup)
+    val_array = create_value_array(name_array)
+    print("name_array:", name_array)
     print("val_array:", val_array)
 
     # find idx of clearance and set to 0
@@ -459,7 +456,7 @@ if __name__ == "__main__":
 
     # create the symbolic matrix using the symbolic metabolite array
     list_S_matrix = create_S_matrix(
-        net_df=net_df, actual_meta_lookup=actual_meta_lookup, sym_array=sym_array
+        net_df=net_df, actual_meta_lookup=actual_meta_lookup, name_array=name_array
     )
     sym_S_matrix = Matrix(list_S_matrix).T  # convert to sympy matrix
 
@@ -512,7 +509,7 @@ if __name__ == "__main__":
     # dummy variables to make it clear how we are using scipy.odeint
     arg_a = sym_S_matrix
     arg_b = sym_flux
-    arg_c = sym_array
+    arg_c = name_array
     arg_d = indices_meta_of_interest
     arg_e = derivs_of_interest
 
