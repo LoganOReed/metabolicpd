@@ -7,6 +7,47 @@ import pandas as pd
 # from scipy.integrate import odeint
 
 
+class LIFE_Network:
+    """Implements the pipeline outlined in the related paper."""
+
+    # TODO: add reasonable file checking and exceptions
+    def __init__(self, file):
+        self.network = pd.read_excel(file)
+        unique_entries = np.unique(self.network[["tail", "head"]].values)
+
+        metabolites = []
+        for entry in unique_entries:
+            elements = entry.split(", ")
+            for ele in elements:
+                metabolites.append(ele)
+        new_unique_metabolites = list(dict.fromkeys(metabolites))
+
+        metabolite_types = []
+        for ele in new_unique_metabolites:
+            # Using regular expression strings to identify source or sink terms in metabolite dictionary keys
+            sink_res = re.search("^[e]+[0-9]$", ele)  # starts with e, ends with #...
+            source_res = re.search("^[s]+[0-9]$", ele)  # starts with s, end with #...
+            if (
+                sink_res is not None
+            ):  # check if we found something in the entry that matches the format of 'e###'
+                metabolite_types.append("sink")
+            elif (
+                source_res is not None
+            ):  # chick if we found something that matches format of source term
+                metabolite_types.append("source")
+            else:  # if we didn't find a source or sink term, then it must be an actual metabolite!
+                metabolite_types.append("actual")
+
+        temp_dict = {
+            "index": [i for i in range(0, len(new_unique_metabolites))],
+            "name": new_unique_metabolites,
+            "type": metabolite_types,
+        }
+        self.df = pd.DataFrame(temp_dict)
+        np.random.seed(seed=12)
+        self.df = self.df.assign(vals=np.random.rand(len(self.df.index)))
+
+
 def extract_metabolites(data_frame):
     """Extracts the unique names within the network dataframe.
 
@@ -70,11 +111,11 @@ def create_random_values(df):
 
 
 if __name__ == "__main__":
-    data_frame = pd.read_excel("data/simple_pd_network.xlsx")
-    metabolites = extract_metabolites(data_frame)
-    print(type(metabolites))
-    print(metabolites)
-    metabolites = create_random_values(metabolites)
-    print(metabolites)
+    network = LIFE_Network("data/simple_pd_network.xlsx")
+    print(type(network.df))
+    print(network.df)
+    # metabolites = create_random_values(metabolites)
+    # print(metabolites)
+
     # print(metabolite_types)
     # print("index of 's6' "+str(unique_metabolites.index("a_syn_0")))
