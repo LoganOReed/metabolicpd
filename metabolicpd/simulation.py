@@ -5,6 +5,8 @@ import numpy as np
 import pandas as pd
 import scipy.integrate as scp
 
+# import seaborn as sns
+
 # from scipy.integrate import odeint
 
 
@@ -43,16 +45,16 @@ class LIFE_Network:
                 metabolite_types.append("actual")
 
         temp_dict = {
-            "index": [i for i in range(0, len(new_unique_metabolites))],
             "name": new_unique_metabolites,
             "type": metabolite_types,
+            "fixed": False,
         }
         self.df = pd.DataFrame(temp_dict)
-        # initialize random masses for metabolites
-        np.random.seed(seed=12)
+        np.random.default_rng()
         self.curr_mass = np.random.rand(len(self.df.index))
         self.df = self.df.assign(mass=self.curr_mass)
-        self.flux = np.ones(self.network.shape[0])
+        # self.flux = np.ones(self.network.shape[0])
+        self.flux = np.random.default_rng().uniform(0.5, 1.0, self.network.shape[0])
 
     # NOTE: I've set this up so ideally it will only be called by the "simulation" function once written
     def create_S_matrix(self, mass):
@@ -89,23 +91,17 @@ class LIFE_Network:
             for uber in uber_modulators:
                 # there should probably be some checking that happens so we don't duplicate the code in the if statements
                 if uber[-1] == "+":  # check the last term in the entry, enhancer
-                    # TODO Warning this feels very clunky and potentially slow
-                    idx = self.df.loc[self.df["name"] == uber[:-2], "index"].to_numpy()[
-                        0
-                    ]
+                    idx = self.df[self.df["name"] == uber[:-2]].index.to_numpy()[0]
                     # note uber_term will always be greater than one
                     uber_term = uber_term * np.exp(mass[idx] / (mass[idx] + 1))
                 elif uber[-1] == "-":  # check the last term in the entry, enhancer
-                    # TODO Warning this feels very clunky and potentially slow
-                    idx = self.df.loc[self.df["name"] == uber[:-2], "index"].to_numpy()[
-                        0
-                    ]
+                    idx = self.df[self.df["name"] == uber[:-2]].index.to_numpy()[0]
                     # note uber_term will always be less than one
                     uber_term = uber_term / np.exp(mass[idx] / (mass[idx] + 1))
 
             # Note that I'm vectorizing as much as possible as the actual dataframe will be massive.
-            idxs = self.df.loc[self.df["name"].isin(substrates), "index"]
-            idxp = self.df.loc[self.df["name"].isin(products), "index"]
+            idxs = self.df[self.df["name"].isin(substrates)].index.to_numpy()
+            idxp = self.df[self.df["name"].isin(products)].index.to_numpy()
             # Case: Hyperedge
             if len(substrates) > 1 or len(products) > 1:
                 # This chunk of code finds min, and sets col values for both substrates and products appropriately
@@ -127,29 +123,49 @@ class LIFE_Network:
                     col[idxs] = -1 * mass[idxs] * uber_term
                     col[idxp] = mass[idxs] * uber_term
             s_matrix.append(col)
-            # Seems to be the most sane way to check this code
-            # print(pd.DataFrame(col).to_markdown())
         return np.array(s_matrix).T
+
+    def __s_function(self, t, x):
+        fixed_idx = self.df[self.df["fixed"]].index.to_numpy()
+        der = np.matmul(self.create_S_matrix(x), self.flux)
+        # set to zero bevause its the der and we want it constant
+        der[fixed_idx] = 0.0
+
+        return der
 
     # NOTE: I think Chris uses metabolite mass for flux value as well, but I'm going to leave it constant for now
     def simulate(self, t_0, t):
         """Runs the simulation."""
-        print(self.create_S_matrix(self.curr_mass).shape)
-        print(self.flux.shape)
-        return scp.solve_ivp(
-            lambda t, x: np.matmul(self.create_S_matrix(x), self.flux),
+        sol = scp.solve_ivp(
+            self.__s_function,
             (t_0, t),
             self.curr_mass,
             t_eval=np.linspace(t_0, t),
         )
+        # update dataframe with new mass
+        return sol
 
 
 if __name__ == "__main__":
     network = LIFE_Network("data/simple_pd_network.xlsx")
+    idx = network.df.loc[network.df["name"] == "gba_0"].index.to_numpy()
+    idx2 = network.df.loc[network.df["name"] == "clearance_0"].index.to_numpy()
+    network.curr_mass[idx] = 2.5
+    network.curr_mass[idx2] = 0
     print(network.curr_mass)
+    network.df.loc[network.df["name"] == "gba_0", ["fixed"]] = True
+    network.df.loc[network.df["name"] == "gba_0", ["mass"]] = 2.5
     print(network.df.to_markdown())
     result = network.simulate(0, 10)
     print(result.message)
+    print(network.df.to_markdown())
+    # takes in xlsx, (optional) initial mass/flux, (optional) simulation time
+    # gives result of simulation, interfaces for plotting/saving/analysing
+
+    # It makes sense to have another class specifically as an interface for plotting
+
+    # So at the very least I should have one more class for reading in xlsx and cleaning the data
+
     metas_to_plot = [
         "a_syn_0",
         "a_syn_1",
@@ -161,7 +177,6 @@ if __name__ == "__main__":
         "mis_a_syn_1",
         "mutant_lrrk2_0",
     ]
-
     metabolites_to_plot = [0, 1, 3, 6, 17, 22, 23, 25]
     label_idx = 0
     for i in metabolites_to_plot:
@@ -171,7 +186,3 @@ if __name__ == "__main__":
     plt.xlabel("$t$")  # the horizontal axis represents the time
     plt.legend()  # show how the colors correspond to the components of X
     plt.show()
-    # plt.plot(t, values_of_interest, label=metabolites_to_plot)
-    # plt.ylim([0, 3])
-    # plt.legend()
-    # plt.show()
