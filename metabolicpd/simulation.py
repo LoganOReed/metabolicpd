@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import re
 
 import matplotlib.pyplot as plt
@@ -9,16 +11,26 @@ import scipy.integrate as scp
 
 
 class LIFE_Network:
-    """Implements the pipeline outlined in the related paper."""
+    """Implements the pipeline outlined in the associated paper.
+
+    Attributes:
+        network (DataFrame): Stores the graph/network for the system.
+        df (DataFrame): Stores an indexed list of metabolites and their properties
+        mass (ndarray): Current masses for metabolites, indices matching `df`'s indices
+        flux (ndarray): Current fluxes for the network, indices matching `df`'s indices
+
+    """
 
     # TODO: add reasonable file checking and exceptions
-    # TODO: add constructor that allows user to pick initial flux/mass
-    # TODO: Decide if I should keep curr_mass in class or extract it
-    def __init__(self, file):
+    def __init__(self, file=None, mass=None, flux=None):
         # read graph/network from clean file
-        self.network = pd.read_excel(file)
-        unique_entries = np.unique(self.network[["tail", "head"]].values)
+        if file is None:
+            raise ValueError("A file path must be given.")
+        else:
+            self.network = pd.read_excel(file)
+            unique_entries = np.unique(self.network[["tail", "head"]].values)
 
+        # Gather list of metabolites in network
         metabolites = []
         for entry in unique_entries:
             elements = entry.split(", ")
@@ -26,6 +38,7 @@ class LIFE_Network:
                 metabolites.append(ele)
         new_unique_metabolites = list(dict.fromkeys(metabolites))
 
+        # Use names to determine type of metabolites
         metabolite_types = []
         for ele in new_unique_metabolites:
             # Using regular expression strings to identify source or sink terms in metabolite dictionary keys
@@ -42,17 +55,24 @@ class LIFE_Network:
             else:  # if we didn't find a source or sink term, then it must be an actual metabolite!
                 metabolite_types.append("actual")
 
+        # use previous lists to construct dictionary which will be used in DataFrame construction
         temp_dict = {
             "name": new_unique_metabolites,
             "type": metabolite_types,
             "fixed": False,
         }
         self.df = pd.DataFrame(temp_dict)
-        np.random.default_rng()
-        self.curr_mass = np.random.rand(len(self.df.index))
-        self.df = self.df.assign(mass=self.curr_mass)
-        # self.flux = np.ones(self.network.shape[0])
-        self.flux = np.random.default_rng().uniform(0.1, 0.8, self.network.shape[0])
+
+        if mass is None:
+            np.random.default_rng()
+            self.mass = np.random.rand(len(self.df.index))
+        else:
+            self.mass = mass
+
+        if flux is None:
+            self.flux = np.ones(self.network.shape[0])
+        else:
+            self.flux = flux
 
     # NOTE: I've set this up so ideally it will only be called by the "simulation" function once written
     def create_S_matrix(self, mass):
@@ -128,16 +148,14 @@ class LIFE_Network:
         der = np.matmul(self.create_S_matrix(x), self.flux)
         # set to zero bevause its the der and we want it constant
         der[fixed_idx] = 0.0
-
         return der
 
-    # NOTE: I think Chris uses metabolite mass for flux value as well, but I'm going to leave it constant for now
     def simulate(self, t_0, t):
         """Runs the simulation."""
         sol = scp.solve_ivp(
             self.__s_function,
             (t_0, t),
-            self.curr_mass,
+            self.mass,
             t_eval=np.linspace(t_0, t),
         )
         return sol
@@ -148,16 +166,19 @@ class LIFE_Network:
         """Sets fixed flag to true and mass value to val."""
         self.df.loc[self.df["name"].isin(mtbs), ["fixed"]] = True
         idxs = self.df[self.df["name"].isin(mtbs)].index.to_numpy()
-        self.curr_mass[idxs] = vals
+        self.mass[idxs] = vals
 
     def setInitialValue(self, mtbs, vals):
         """Sets mass value to vals."""
         idxs = self.df[self.df["name"].isin(mtbs)].index.to_numpy()
-        self.curr_mass[idxs] = vals
+        self.mass[idxs] = vals
 
 
 if __name__ == "__main__":
-    network = LIFE_Network("data/simple_pd_network.xlsx")
+    flux = np.random.default_rng().uniform(0.1, 0.8, 28)
+    # network = LIFE_Network("data/simple_pd_network.xlsx", mass=None, flux=flux)
+    network = LIFE_Network("data/simple_pd_network.xlsx", mass=None, flux=None)
+
     # To fix clearance_0 at 0.0 for whole runtime
     network.fixMetabolites(["gba_0", "clearance_0"], [0.0, 2.5])
     # To match old simulation example
