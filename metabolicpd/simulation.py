@@ -7,8 +7,6 @@ import scipy.integrate as scp
 
 # import seaborn as sns
 
-# from scipy.integrate import odeint
-
 
 class LIFE_Network:
     """Implements the pipeline outlined in the related paper."""
@@ -54,7 +52,7 @@ class LIFE_Network:
         self.curr_mass = np.random.rand(len(self.df.index))
         self.df = self.df.assign(mass=self.curr_mass)
         # self.flux = np.ones(self.network.shape[0])
-        self.flux = np.random.default_rng().uniform(0.5, 1.0, self.network.shape[0])
+        self.flux = np.random.default_rng().uniform(0.1, 0.8, self.network.shape[0])
 
     # NOTE: I've set this up so ideally it will only be called by the "simulation" function once written
     def create_S_matrix(self, mass):
@@ -142,21 +140,31 @@ class LIFE_Network:
             self.curr_mass,
             t_eval=np.linspace(t_0, t),
         )
-        # update dataframe with new mass
         return sol
+
+    # TODO: Right now the vals need to be ordered by the
+    # index not the order the names are entered in
+    def fixMetabolites(self, mtbs, vals):
+        """Sets fixed flag to true and mass value to val."""
+        self.df.loc[self.df["name"].isin(mtbs), ["fixed"]] = True
+        idxs = self.df[self.df["name"].isin(mtbs)].index.to_numpy()
+        self.curr_mass[idxs] = vals
+
+    def setInitialValue(self, mtbs, vals):
+        """Sets mass value to vals."""
+        idxs = self.df[self.df["name"].isin(mtbs)].index.to_numpy()
+        self.curr_mass[idxs] = vals
 
 
 if __name__ == "__main__":
     network = LIFE_Network("data/simple_pd_network.xlsx")
-    idx = network.df.loc[network.df["name"] == "gba_0"].index.to_numpy()
-    idx2 = network.df.loc[network.df["name"] == "clearance_0"].index.to_numpy()
-    network.curr_mass[idx] = 2.5
-    network.curr_mass[idx2] = 0
-    print(network.curr_mass)
-    network.df.loc[network.df["name"] == "gba_0", ["fixed"]] = True
-    network.df.loc[network.df["name"] == "gba_0", ["mass"]] = 2.5
+    # To fix clearance_0 at 0.0 for whole runtime
+    network.fixMetabolites(["gba_0", "clearance_0"], [0.0, 2.5])
+    # To match old simulation example
+    # network.fixMetabolites(["gba_0"], [2.5])
+    # network.setInitialValue(["clearance_0"], [0.0])
     print(network.df.to_markdown())
-    result = network.simulate(0, 10)
+    result = network.simulate(0, 12)
     print(result.message)
     print(network.df.to_markdown())
     # takes in xlsx, (optional) initial mass/flux, (optional) simulation time
