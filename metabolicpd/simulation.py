@@ -82,7 +82,7 @@ class LIFE_Network:
         matrix and metabolites in the network corresponding to the rows of the matrix.
 
         Args:
-            mass : Numpy array of masses to construct the S matrix based off of.
+            mass (ndarray): Numpy array of masses to construct the S matrix based off of.
 
         Returns:
             A numpy array representing the S matrix for the current metabolite masses.
