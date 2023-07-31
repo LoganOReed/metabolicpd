@@ -103,14 +103,12 @@ class LIFE_Network:
 
             # build the uber term for each expression, default if no uber edges is 1
             uber_term = 1.0
-            # TODO Ask Chris if we mean to modify the initial uber_term=1 by multiple metabolites
-            #      It seems like it's accounting for the various weights of each + and - on an edge
-            #      But I still don't fully understand the definition of the S matrix we are using
             for uber in uber_modulators:
                 # there should probably be some checking that happens so we don't duplicate the code in the if statements
                 if uber[-1] == "+":  # check the last term in the entry, enhancer
                     idx = self.df[self.df["name"] == uber[:-2]].index.to_numpy()[0]
                     # note uber_term will always be greater than one
+                    # TODO: pull the function multiplying the uber edge into a class variable
                     uber_term = uber_term * np.exp(mass[idx] / (mass[idx] + 1))
                 elif uber[-1] == "-":  # check the last term in the entry, enhancer
                     idx = self.df[self.df["name"] == uber[:-2]].index.to_numpy()[0]
@@ -123,7 +121,9 @@ class LIFE_Network:
             # Case: Hyperedge
             if len(substrates) > 1 or len(products) > 1:
                 # This chunk of code finds min, and sets col values for both substrates and products appropriately
+                # TODO: pull min function into class variable and initialize it
                 min_sub = np.min(mass[idxs])
+                print(f"Minimum result {min_sub}")
                 col[idxs] = -1 * min_sub * uber_term
                 col[idxp] = min_sub * uber_term
             # Case: Not Hyperedge
@@ -132,6 +132,7 @@ class LIFE_Network:
                     self.df.loc[self.df["name"] == substrates[0], "type"].item()
                     == "source"
                 ):
+                    # TODO: get rid of fixed one and add a function which takes index or name and returns weight (maybe between 0 and 1)
                     col[idxp] = 1
                 elif (
                     self.df.loc[self.df["name"] == products[0], "type"].item() == "sink"
@@ -180,10 +181,11 @@ if __name__ == "__main__":
     network = LIFE_Network("data/simple_pd_network.xlsx", mass=None, flux=None)
 
     # To fix clearance_0 at 0.0 for whole runtime
-    network.fixMetabolites(["gba_0", "clearance_0"], [0.0, 2.5])
+    # the masses need to be in the order of indices not the order of metabolite names
+    # network.fixMetabolites(["gba_0", "clearance_0"], [0.0, 2.5])
     # To match old simulation example
-    # network.fixMetabolites(["gba_0"], [2.5])
-    # network.setInitialValue(["clearance_0"], [0.0])
+    network.fixMetabolites(["gba_0"], [2.5])
+    network.setInitialValue(["clearance_0"], [0.0])
     print(network.df.to_markdown())
     result = network.simulate(0, 12)
     print(result.message)
