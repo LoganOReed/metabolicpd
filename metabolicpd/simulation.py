@@ -21,8 +21,15 @@ class LIFE_Network:
 
     """
 
-    # TODO: add reasonable file checking and exceptions
-    def __init__(self, file=None, mass=None, flux=None):
+    def __init__(
+        self,
+        file=None,
+        mass=None,
+        flux=None,
+        ffunc=None,
+        min_func=None,
+        source_weights=None,
+    ):
         # read graph/network from clean file
         if file is None:
             raise ValueError("A file path must be given.")
@@ -74,6 +81,11 @@ class LIFE_Network:
         else:
             self.flux = flux
 
+        if ffunc is None:
+            self.ffunc = lambda mass, idx: np.exp(mass[idx] / (mass[idx] + 1))
+        else:
+            self.ffunc = ffunc
+
     # NOTE: I've set this up so ideally it will only be called by the "simulation" function once written
     def create_S_matrix(self, mass):
         """Create the 'S' matrix, representing the dynamics for the network x' = S(x) * f.
@@ -109,11 +121,11 @@ class LIFE_Network:
                     idx = self.df[self.df["name"] == uber[:-2]].index.to_numpy()[0]
                     # note uber_term will always be greater than one
                     # TODO: pull the function multiplying the uber edge into a class variable
-                    uber_term = uber_term * np.exp(mass[idx] / (mass[idx] + 1))
+                    uber_term = uber_term * self.ffunc(mass, idx)
                 elif uber[-1] == "-":  # check the last term in the entry, enhancer
                     idx = self.df[self.df["name"] == uber[:-2]].index.to_numpy()[0]
                     # note uber_term will always be less than one
-                    uber_term = uber_term / np.exp(mass[idx] / (mass[idx] + 1))
+                    uber_term = uber_term / self.ffunc(mass, idx)
 
             # Note that I'm vectorizing as much as possible as the actual dataframe will be massive.
             idxs = self.df[self.df["name"].isin(substrates)].index.to_numpy()
@@ -133,6 +145,7 @@ class LIFE_Network:
                     == "source"
                 ):
                     # TODO: get rid of fixed one and add a function which takes index or name and returns weight (maybe between 0 and 1)
+                    # TODO: Dict with keys being source names and values being weights
                     col[idxp] = 1
                 elif (
                     self.df.loc[self.df["name"] == products[0], "type"].item() == "sink"
@@ -176,9 +189,15 @@ class LIFE_Network:
 
 
 if __name__ == "__main__":
-    flux = np.random.default_rng().uniform(0.1, 0.8, 28)
     # network = LIFE_Network("data/simple_pd_network.xlsx", mass=None, flux=flux)
-    network = LIFE_Network("data/simple_pd_network.xlsx", mass=None, flux=None)
+    network = LIFE_Network(
+        file="data/simple_pd_network.xlsx",
+        mass=None,  # Makes the masses random via constructor
+        flux=np.random.default_rng().uniform(0.1, 0.8, 28),
+        ffunc=lambda mass, idx: np.exp(mass[idx] / (mass[idx] + 1)),
+        min_func=None,
+        source_weights=None,
+    )
 
     # To fix clearance_0 at 0.0 for whole runtime
     # the masses need to be in the order of indices not the order of metabolite names
