@@ -86,7 +86,13 @@ class LIFE_Network:
         else:
             self.ffunc = ffunc
 
+        if min_func is None:
+            self.min_func = lambda mass, idxs: np.min(mass[idxs])
+        else:
+            self.min_func = min_func
+
     # NOTE: I've set this up so ideally it will only be called by the "simulation" function once written
+    # TODO: Write Documentation for new member variables, write example use case
     def create_S_matrix(self, mass):
         """Create the 'S' matrix, representing the dynamics for the network x' = S(x) * f.
 
@@ -120,7 +126,6 @@ class LIFE_Network:
                 if uber[-1] == "+":  # check the last term in the entry, enhancer
                     idx = self.df[self.df["name"] == uber[:-2]].index.to_numpy()[0]
                     # note uber_term will always be greater than one
-                    # TODO: pull the function multiplying the uber edge into a class variable
                     uber_term = uber_term * self.ffunc(mass, idx)
                 elif uber[-1] == "-":  # check the last term in the entry, enhancer
                     idx = self.df[self.df["name"] == uber[:-2]].index.to_numpy()[0]
@@ -134,7 +139,7 @@ class LIFE_Network:
             if len(substrates) > 1 or len(products) > 1:
                 # This chunk of code finds min, and sets col values for both substrates and products appropriately
                 # TODO: pull min function into class variable and initialize it
-                min_sub = np.min(mass[idxs])
+                min_sub = self.min_func(mass, idxs)
                 print(f"Minimum result {min_sub}")
                 col[idxs] = -1 * min_sub * uber_term
                 col[idxp] = min_sub * uber_term
@@ -190,12 +195,13 @@ class LIFE_Network:
 
 if __name__ == "__main__":
     # network = LIFE_Network("data/simple_pd_network.xlsx", mass=None, flux=flux)
+    # TODO: make a list of a couple interesting argument values for test cases
     network = LIFE_Network(
         file="data/simple_pd_network.xlsx",
         mass=None,  # Makes the masses random via constructor
         flux=np.random.default_rng().uniform(0.1, 0.8, 28),
         ffunc=lambda mass, idx: np.exp(mass[idx] / (mass[idx] + 1)),
-        min_func=None,
+        min_func=lambda mass, idxs: np.min(mass[idxs]),
         source_weights=None,
     )
 
