@@ -91,6 +91,15 @@ class LIFE_Network:
         else:
             self.min_func = min_func
 
+        # TODO: Come up with input that is easier for user
+        if source_weights is None:
+            temp_list = []
+            for i in range(len(self.df.index)):
+                temp_list.append(1)
+            self.source_weights = np.array(temp_list)
+        else:
+            self.source_weights = source_weights
+
     # NOTE: I've set this up so ideally it will only be called by the "simulation" function once written
     # TODO: Write Documentation for new member variables, write example use case
     def create_S_matrix(self, mass):
@@ -138,9 +147,7 @@ class LIFE_Network:
             # Case: Hyperedge
             if len(substrates) > 1 or len(products) > 1:
                 # This chunk of code finds min, and sets col values for both substrates and products appropriately
-                # TODO: pull min function into class variable and initialize it
                 min_sub = self.min_func(mass, idxs)
-                print(f"Minimum result {min_sub}")
                 col[idxs] = -1 * min_sub * uber_term
                 col[idxp] = min_sub * uber_term
             # Case: Not Hyperedge
@@ -149,9 +156,11 @@ class LIFE_Network:
                     self.df.loc[self.df["name"] == substrates[0], "type"].item()
                     == "source"
                 ):
-                    # TODO: get rid of fixed one and add a function which takes index or name and returns weight (maybe between 0 and 1)
-                    # TODO: Dict with keys being source names and values being weights
-                    col[idxp] = 1
+                    # NOTE: Implementation assumes source edges are simple diredges,
+                    #       since networks can always be converted to this form
+                    # TODO: Implement function which converts network to this form
+                    col[idxp] = self.source_weights[idxp]
+                    # col[idxp] = 1
                 elif (
                     self.df.loc[self.df["name"] == products[0], "type"].item() == "sink"
                 ):
@@ -196,6 +205,8 @@ class LIFE_Network:
 if __name__ == "__main__":
     # network = LIFE_Network("data/simple_pd_network.xlsx", mass=None, flux=flux)
     # TODO: make a list of a couple interesting argument values for test cases
+    # TODO: design dataframe for outputting simulation results
+    # TODO: Write function that saves resultant data to file
     network = LIFE_Network(
         file="data/simple_pd_network.xlsx",
         mass=None,  # Makes the masses random via constructor
@@ -211,7 +222,7 @@ if __name__ == "__main__":
     # To match old simulation example
     network.fixMetabolites(["gba_0"], [2.5])
     network.setInitialValue(["clearance_0"], [0.0])
-    print(network.df.to_markdown())
+    # TODO: Write code to output run time for simulation
     result = network.simulate(0, 12)
     print(result.message)
     print(network.df.to_markdown())
