@@ -10,13 +10,32 @@ import pandas as pd
 import scipy.integrate as scp
 
 # import seaborn as sns
+is_timing = True
+log_to_file = False
 
-# global bool for timing
-is_timing = False
+logger = logging.getLogger("simulation")
+logger.setLevel(logging.DEBUG)
+# create file handler which logs even debug messages
+fh = logging.FileHandler("data/time.log")
+fh.setLevel(logging.INFO)
+# create console handler with a higher log level
+ch = logging.StreamHandler()
+ch.setLevel(logging.WARNING)
+# create formatter and add it to the handlers
+formatter = logging.Formatter(
+    fmt="%(asctime)s %(message)s", datefmt="%m/%d/%Y %I:%M:%S %p"
+)
+ch.setFormatter(formatter)
+fh.setFormatter(formatter)
+# add the handlers to logger
+logger.addHandler(ch)
+logger.addHandler(fh)
 
 
 # def of conditional decorator
-def conditional_timer(timer_name, log_level=logging.info, condition=is_timing):
+# Note: Right now changing logger level between info and warning toggles printing to console
+# TODO: Make switching logging styles easier
+def conditional_timer(timer_name, log_level=logger.warning, condition=True):
     def decorator(func):
         if not condition:
             # Return the function unchanged, not decorated.
@@ -119,6 +138,62 @@ class LIFE_Network:
         else:
             self.source_weights = source_weights
 
+        self.substrates = []
+        self.substrates_sources = []
+        self.products = []
+        self.products_sinks = []
+        self.uber_modulators = []
+        self.uber_modulator_signs = []
+        # Generate lookup tables for s matrix functions
+        # TODO: Check with Chris that generating this once will not break edge cases
+        # TODO: Check if columns will always be in this order
+        for row in self.network[["tail", "head", "uber"]].itertuples():
+            print(row)
+            # print(row.tail.split(", "))
+            # print(row.head.split(", "))
+            # print(row.uber.split(", "))
+            sub_str = self.df[self.df["name"].isin(row.tail.split(", "))].index.tolist()
+            self.substrates.append(sub_str)
+            if len(sub_str) != 1:
+                self.substrates_sources.append([])
+            elif self.df.loc[self.df.index[sub_str[0]], "type"] == "source":
+                self.substrates_sources.append([True])
+            else:
+                self.substrates_sources.append([False])
+
+            prod_snk = self.df[
+                self.df["name"].isin(row.head.split(", "))
+            ].index.tolist()
+            self.products.append(prod_snk)
+            if len(prod_snk) != 1:
+                self.products_sinks.append([])
+            elif self.df.loc[self.df.index[prod_snk[0]], "type"] == "sink":
+                self.products_sinks.append([True])
+            else:
+                self.products_sinks.append([False])
+
+            self.uber_modulators.append(
+                self.df[
+                    self.df["name"].isin([s[:-2] for s in row.uber.split(", ")])
+                ].index.tolist()
+            )
+            u_m = row.uber.split(", ")
+            u_m_s = []
+            for uber in u_m:
+                # there should probably be some checking that happens so we don't duplicate the code in the if statements
+                if uber[-1] == "+":  # check the last term in the entry, enhancer
+                    u_m_s.append(True)
+                elif uber[-1] == "-":  # check the last term in the entry, enhancer
+                    u_m_s.append(False)
+            self.uber_modulator_signs.append(u_m_s)
+
+        print(self.substrates)
+        print(self.substrates_sources)
+        print(self.products)
+        print(self.products_sinks)
+        print(self.uber_modulators)
+        print(self.uber_modulator_signs)
+
     # NOTE: I've set this up so ideally it will only be called by the "simulation" function once written
     # TODO: Write Documentation for new member variables, write example use case
     @conditional_timer("create_S_matrix")
@@ -136,55 +211,52 @@ class LIFE_Network:
         """
         s_matrix = []
         # TODO: Check if columns will always be in this order
-        edge_columns_df = self.network[
-            ["tail", "head", "uber"]
-        ]  # get a dataframe for just the edges (future-proof for uberedges)
-        for row in edge_columns_df.itertuples():
+        for row in self.network[["tail", "head", "uber"]].itertuples():
             # iterate through each of the edges
             # there could be more than one substrate
             # or product! (for instance, in a hyperedge)
-            substrates = row.tail.split(", ")
-            products = row.head.split(", ")
-            uber_modulators = row.uber.split(", ")
 
+            row_index = row.Index
             col = np.zeros(self.df.shape[0])
 
             # build the uber term for each expression, default if no uber edges is 1
             uber_term = 1.0
-            for uber in uber_modulators:
+            for i in range(len(self.uber_modulator_signs[row_index])):
                 # there should probably be some checking that happens so we don't duplicate the code in the if statements
-                if uber[-1] == "+":  # check the last term in the entry, enhancer
-                    idx = self.df[self.df["name"] == uber[:-2]].index.to_numpy()[0]
-                    # note uber_term will always be greater than one
-                    uber_term = uber_term * self.ffunc(mass, idx)
-                elif uber[-1] == "-":  # check the last term in the entry, enhancer
-                    idx = self.df[self.df["name"] == uber[:-2]].index.to_numpy()[0]
+                if self.uber_modulator_signs[row_index][
+                    i
+                ]:  # check the last term in the entry, enhancer
+                    uber_term = uber_term * self.ffunc(
+                        mass, self.uber_modulators[row_index][i]
+                    )
+                elif not self.uber_modulator_signs[row_index][
+                    i
+                ]:  # check the last term in the entry, enhancer
                     # note uber_term will always be less than one
-                    uber_term = uber_term / self.ffunc(mass, idx)
+                    uber_term = uber_term / self.ffunc(
+                        mass, self.uber_modulators[row_index][i]
+                    )
 
             # Note that I'm vectorizing as much as possible as the actual dataframe will be massive.
-            idxs = self.df[self.df["name"].isin(substrates)].index.to_numpy()
-            idxp = self.df[self.df["name"].isin(products)].index.to_numpy()
+            # Also note that I pulled as much as possible out of the function as its called every time simulate() iterates
+            # idxs = np.array(self.substrates[row_index])
+            # idxp = np.array(self.products[row_index])
+            idxs = self.substrates[row_index]
+            idxp = self.products[row_index]
             # Case: Hyperedge
-            if len(substrates) > 1 or len(products) > 1:
+            if len(idxs) > 1 or len(idxp) > 1:
                 # This chunk of code finds min, and sets col values for both substrates and products appropriately
                 min_sub = self.min_func(mass, idxs)
                 col[idxs] = -1 * min_sub * uber_term
                 col[idxp] = min_sub * uber_term
             # Case: Not Hyperedge
             else:
-                if (
-                    self.df.loc[self.df["name"] == substrates[0], "type"].item()
-                    == "source"
-                ):
+                if self.substrates_sources[row_index][0]:
                     # NOTE: Implementation assumes source edges are simple diredges,
                     #       since networks can always be converted to this form
                     # TODO: Implement function which converts network to this form
                     col[idxp] = self.source_weights[idxp]
-                    # col[idxp] = 1
-                elif (
-                    self.df.loc[self.df["name"] == products[0], "type"].item() == "sink"
-                ):
+                elif self.products_sinks[row_index][0]:
                     col[idxs] = -1 * mass[idxs] * uber_term
                 else:
                     col[idxs] = -1 * mass[idxs] * uber_term
@@ -262,14 +334,14 @@ def print_timer_stats():
 
 
 if __name__ == "__main__":
-    if is_timing:
-        logging.basicConfig(
-            filename="data/time.log",
-            encoding="utf-8",
-            level=logging.INFO,
-            format="%(asctime)s %(message)s",
-            datefmt="%m/%d/%Y %I:%M:%S %p",
-        )
+    # logging.basicConfig(
+    #     filename="data/time.log",
+    #     encoding="utf-8",
+    #     level=logging.WARNING,
+    #     format="%(asctime)s %(message)s",
+    #     datefmt="%m/%d/%Y %I:%M:%S %p",
+    # )
+
     # network = LIFE_Network("data/simple_pd_network.xlsx", mass=None, flux=flux)
     # TODO: make a list of a couple interesting argument values for test cases
     # TODO: design dataframe for outputting simulation results
@@ -294,7 +366,7 @@ if __name__ == "__main__":
 
     result = network.simulate(0, 12)
     print(result.message)
-    # print(network.df.to_markdown())
+    print(network.df.to_markdown())
 
     # takes in xlsx, (optional) initial mass/flux, (optional) simulation time
     # gives result of simulation, interfaces for plotting/saving/analysing
@@ -302,4 +374,4 @@ if __name__ == "__main__":
     # It makes sense to have another class specifically as an interface for plotting
 
     # So at the very least I should have one more class for reading in xlsx and cleaning the data
-    # basic_graph(result)
+    basic_graph(result)
