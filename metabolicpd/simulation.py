@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import logging
+import logging  # for sending timer logs to a file
 import re
 
 import codetiming as ct
@@ -10,6 +10,22 @@ import pandas as pd
 import scipy.integrate as scp
 
 # import seaborn as sns
+
+# global bool for timing
+is_timing = False
+
+
+# def of conditional decorator
+def conditional_timer(timer_name, log_level=logging.info, condition=is_timing):
+    def decorator(func):
+        if not condition:
+            # Return the function unchanged, not decorated.
+            return func
+        return ct.Timer(
+            name=timer_name, text="{name} time: {:.4f} seconds", logger=log_level
+        )(func)
+
+    return decorator
 
 
 class LIFE_Network:
@@ -23,7 +39,7 @@ class LIFE_Network:
 
     """
 
-    @ct.Timer(name="__init__", text="{name} time: {:.4f} seconds", logger=logging.info)
+    @conditional_timer("__init__")
     def __init__(
         self,
         file=None,
@@ -105,9 +121,7 @@ class LIFE_Network:
 
     # NOTE: I've set this up so ideally it will only be called by the "simulation" function once written
     # TODO: Write Documentation for new member variables, write example use case
-    @ct.Timer(
-        name="create_S_matrix", text="{name} time: {:.4f} seconds", logger=logging.info
-    )
+    @conditional_timer("create_S_matrix")
     def create_S_matrix(self, mass):
         """Create the 'S' matrix, representing the dynamics for the network x' = S(x) * f.
 
@@ -210,53 +224,8 @@ class LIFE_Network:
         self.mass[idxs] = vals
 
 
-if __name__ == "__main__":
-    logging.basicConfig(
-        filename="data/time.log",
-        encoding="utf-8",
-        level=logging.INFO,
-        format="%(asctime)s %(message)s",
-        datefmt="%m/%d/%Y %I:%M:%S %p",
-    )
-    # network = LIFE_Network("data/simple_pd_network.xlsx", mass=None, flux=flux)
-    # TODO: make a list of a couple interesting argument values for test cases
-    # TODO: design dataframe for outputting simulation results
-    # TODO: Write function that saves resultant data to file
-    network = LIFE_Network(
-        file="data/simple_pd_network.xlsx",
-        mass=None,  # Makes the masses random via constructor
-        flux=np.random.default_rng().uniform(0.1, 0.8, 28),
-        ffunc=lambda mass, idx: np.exp(mass[idx] / (mass[idx] + 1)),
-        min_func=lambda mass, idxs: np.min(mass[idxs]),
-        source_weights=None,
-    )
-
-    # To fix clearance_0 at 0.0 for whole runtime
-    # the masses need to be in the order of indices not the order of metabolite names
-    # network.fixMetabolites(["gba_0", "clearance_0"], [0.0, 2.5])
-    # To match old simulation example
-    network.fixMetabolites(["gba_0"], [2.5])
-    network.setInitialValue(["clearance_0"], [0.0])
-    # TODO: Write code to output run time for simulation
-    result = network.simulate(0, 12)
-    print(result.message)
-    print(network.df.to_markdown())
-    print(
-        "Count: {0}\nTotal: {1}\nMax: {2}\nMin: {3}\nStdev: {4}".format(
-            ct.Timer.timers.count("create_S_matrix"),
-            ct.Timer.timers.total("create_S_matrix"),
-            ct.Timer.timers.max("create_S_matrix"),
-            ct.Timer.timers.min("create_S_matrix"),
-            ct.Timer.timers.stdev("create_S_matrix"),
-        )
-    )
-    # takes in xlsx, (optional) initial mass/flux, (optional) simulation time
-    # gives result of simulation, interfaces for plotting/saving/analysing
-
-    # It makes sense to have another class specifically as an interface for plotting
-
-    # So at the very least I should have one more class for reading in xlsx and cleaning the data
-
+# TODO: Generalize this and give docstring
+def basic_graph(result):
     metas_to_plot = [
         "a_syn_0",
         "a_syn_1",
@@ -277,3 +246,60 @@ if __name__ == "__main__":
     plt.xlabel("$t$")  # the horizontal axis represents the time
     plt.legend()  # show how the colors correspond to the components of X
     plt.show()
+
+
+# TODO: Fill this out for general use
+def print_timer_stats():
+    print(
+        "Count: {0}\nTotal: {1}\nMax: {2}\nMin: {3}\nStdev: {4}".format(
+            ct.Timer.timers.count("create_S_matrix"),
+            ct.Timer.timers.total("create_S_matrix"),
+            ct.Timer.timers.max("create_S_matrix"),
+            ct.Timer.timers.min("create_S_matrix"),
+            ct.Timer.timers.stdev("create_S_matrix"),
+        )
+    )
+
+
+if __name__ == "__main__":
+    if is_timing:
+        logging.basicConfig(
+            filename="data/time.log",
+            encoding="utf-8",
+            level=logging.INFO,
+            format="%(asctime)s %(message)s",
+            datefmt="%m/%d/%Y %I:%M:%S %p",
+        )
+    # network = LIFE_Network("data/simple_pd_network.xlsx", mass=None, flux=flux)
+    # TODO: make a list of a couple interesting argument values for test cases
+    # TODO: design dataframe for outputting simulation results
+    # TODO: Write function that saves resultant data to file
+    network = LIFE_Network(
+        file="data/simple_pd_network.xlsx",
+        mass=None,  # Makes the masses random via constructor
+        flux=np.random.default_rng().uniform(0.1, 0.8, 28),
+        ffunc=lambda mass, idx: np.exp(mass[idx] / (mass[idx] + 1)),
+        min_func=lambda mass, idxs: np.min(mass[idxs]),
+        source_weights=None,
+    )
+
+    # To fix clearance_0 at 0.0 for whole runtime
+    # the masses need to be in the order of indices not the order of metabolite names
+    # network.fixMetabolites(["gba_0", "clearance_0"], [0.0, 2.5])
+    # To match old simulation example
+    network.fixMetabolites(["gba_0"], [2.5])
+    network.setInitialValue(["clearance_0"], [0.0])
+    # TODO: Write code to output run time for simulation
+    # cProfile.run('network.simulate(0, 12)')
+
+    result = network.simulate(0, 12)
+    print(result.message)
+    # print(network.df.to_markdown())
+
+    # takes in xlsx, (optional) initial mass/flux, (optional) simulation time
+    # gives result of simulation, interfaces for plotting/saving/analysing
+
+    # It makes sense to have another class specifically as an interface for plotting
+
+    # So at the very least I should have one more class for reading in xlsx and cleaning the data
+    # basic_graph(result)
