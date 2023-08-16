@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
+import logging
 import re
 
+import codetiming as ct
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -21,6 +23,7 @@ class LIFE_Network:
 
     """
 
+    @ct.Timer(name="__init__", text="{name} time: {:.4f} seconds", logger=logging.info)
     def __init__(
         self,
         file=None,
@@ -102,6 +105,9 @@ class LIFE_Network:
 
     # NOTE: I've set this up so ideally it will only be called by the "simulation" function once written
     # TODO: Write Documentation for new member variables, write example use case
+    @ct.Timer(
+        name="create_S_matrix", text="{name} time: {:.4f} seconds", logger=logging.info
+    )
     def create_S_matrix(self, mass):
         """Create the 'S' matrix, representing the dynamics for the network x' = S(x) * f.
 
@@ -115,6 +121,7 @@ class LIFE_Network:
             A numpy array representing the S matrix for the current metabolite masses.
         """
         s_matrix = []
+        # TODO: Check if columns will always be in this order
         edge_columns_df = self.network[
             ["tail", "head", "uber"]
         ]  # get a dataframe for just the edges (future-proof for uberedges)
@@ -171,6 +178,7 @@ class LIFE_Network:
             s_matrix.append(col)
         return np.array(s_matrix).T
 
+    # @ct.Timer(name="__s_function", text="{name} time: {:.4f} seconds")
     def __s_function(self, t, x):
         fixed_idx = self.df[self.df["fixed"]].index.to_numpy()
         der = np.matmul(self.create_S_matrix(x), self.flux)
@@ -203,6 +211,13 @@ class LIFE_Network:
 
 
 if __name__ == "__main__":
+    logging.basicConfig(
+        filename="data/time.log",
+        encoding="utf-8",
+        level=logging.INFO,
+        format="%(asctime)s %(message)s",
+        datefmt="%m/%d/%Y %I:%M:%S %p",
+    )
     # network = LIFE_Network("data/simple_pd_network.xlsx", mass=None, flux=flux)
     # TODO: make a list of a couple interesting argument values for test cases
     # TODO: design dataframe for outputting simulation results
@@ -226,6 +241,15 @@ if __name__ == "__main__":
     result = network.simulate(0, 12)
     print(result.message)
     print(network.df.to_markdown())
+    print(
+        "Count: {0}\nTotal: {1}\nMax: {2}\nMin: {3}\nStdev: {4}".format(
+            ct.Timer.timers.count("create_S_matrix"),
+            ct.Timer.timers.total("create_S_matrix"),
+            ct.Timer.timers.max("create_S_matrix"),
+            ct.Timer.timers.min("create_S_matrix"),
+            ct.Timer.timers.stdev("create_S_matrix"),
+        )
+    )
     # takes in xlsx, (optional) initial mass/flux, (optional) simulation time
     # gives result of simulation, interfaces for plotting/saving/analysing
 
