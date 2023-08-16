@@ -10,9 +10,10 @@ import pandas as pd
 import scipy.integrate as scp
 
 # import seaborn as sns
-is_timing = True
-log_to_file = False
+is_logging = False
+log_to_stream = False
 
+# Setup for always logging to file and logging to stream when level at warning
 logger = logging.getLogger("simulation")
 logger.setLevel(logging.DEBUG)
 # create file handler which logs even debug messages
@@ -35,14 +36,21 @@ logger.addHandler(fh)
 # def of conditional decorator
 # Note: Right now changing logger level between info and warning toggles printing to console
 # TODO: Make switching logging styles easier
-def conditional_timer(timer_name, log_level=logger.warning, condition=True):
+def conditional_timer(timer_name, to_stream=log_to_stream, condition=is_logging):
     def decorator(func):
         if not condition:
             # Return the function unchanged, not decorated.
             return func
-        return ct.Timer(
-            name=timer_name, text="{name} time: {:.4f} seconds", logger=log_level
-        )(func)
+        if to_stream:
+            return ct.Timer(
+                name=timer_name,
+                text="{name} time: {:.4f} seconds",
+                logger=logger.warning,
+            )(func)
+        else:
+            return ct.Timer(
+                name=timer_name, text="{name} time: {:.4f} seconds", logger=logger.info
+            )(func)
 
     return decorator
 
@@ -148,29 +156,25 @@ class LIFE_Network:
         # TODO: Check with Chris that generating this once will not break edge cases
         # TODO: Check if columns will always be in this order
         for row in self.network[["tail", "head", "uber"]].itertuples():
-            print(row)
-            # print(row.tail.split(", "))
-            # print(row.head.split(", "))
-            # print(row.uber.split(", "))
             sub_str = self.df[self.df["name"].isin(row.tail.split(", "))].index.tolist()
             self.substrates.append(sub_str)
             if len(sub_str) != 1:
-                self.substrates_sources.append([])
+                self.substrates_sources.append()
             elif self.df.loc[self.df.index[sub_str[0]], "type"] == "source":
-                self.substrates_sources.append([True])
+                self.substrates_sources.append(True)
             else:
-                self.substrates_sources.append([False])
+                self.substrates_sources.append(False)
 
             prod_snk = self.df[
                 self.df["name"].isin(row.head.split(", "))
             ].index.tolist()
             self.products.append(prod_snk)
             if len(prod_snk) != 1:
-                self.products_sinks.append([])
+                self.products_sinks.append(False)
             elif self.df.loc[self.df.index[prod_snk[0]], "type"] == "sink":
-                self.products_sinks.append([True])
+                self.products_sinks.append(True)
             else:
-                self.products_sinks.append([False])
+                self.products_sinks.append(False)
 
             self.uber_modulators.append(
                 self.df[
@@ -186,13 +190,6 @@ class LIFE_Network:
                 elif uber[-1] == "-":  # check the last term in the entry, enhancer
                     u_m_s.append(False)
             self.uber_modulator_signs.append(u_m_s)
-
-        print(self.substrates)
-        print(self.substrates_sources)
-        print(self.products)
-        print(self.products_sinks)
-        print(self.uber_modulators)
-        print(self.uber_modulator_signs)
 
     # NOTE: I've set this up so ideally it will only be called by the "simulation" function once written
     # TODO: Write Documentation for new member variables, write example use case
@@ -251,12 +248,13 @@ class LIFE_Network:
                 col[idxp] = min_sub * uber_term
             # Case: Not Hyperedge
             else:
-                if self.substrates_sources[row_index][0]:
+                if self.substrates_sources[row_index]:
                     # NOTE: Implementation assumes source edges are simple diredges,
                     #       since networks can always be converted to this form
                     # TODO: Implement function which converts network to this form
+                    # The prev todo probably isn't going to be super useful
                     col[idxp] = self.source_weights[idxp]
-                elif self.products_sinks[row_index][0]:
+                elif self.products_sinks[row_index]:
                     col[idxs] = -1 * mass[idxs] * uber_term
                 else:
                     col[idxs] = -1 * mass[idxs] * uber_term
@@ -334,14 +332,6 @@ def print_timer_stats():
 
 
 if __name__ == "__main__":
-    # logging.basicConfig(
-    #     filename="data/time.log",
-    #     encoding="utf-8",
-    #     level=logging.WARNING,
-    #     format="%(asctime)s %(message)s",
-    #     datefmt="%m/%d/%Y %I:%M:%S %p",
-    # )
-
     # network = LIFE_Network("data/simple_pd_network.xlsx", mass=None, flux=flux)
     # TODO: make a list of a couple interesting argument values for test cases
     # TODO: design dataframe for outputting simulation results
@@ -365,8 +355,7 @@ if __name__ == "__main__":
     # cProfile.run('network.simulate(0, 12)')
 
     result = network.simulate(0, 12)
-    print(result.message)
-    print(network.df.to_markdown())
+    logger.warning(result.message)
 
     # takes in xlsx, (optional) initial mass/flux, (optional) simulation time
     # gives result of simulation, interfaces for plotting/saving/analysing
@@ -374,4 +363,5 @@ if __name__ == "__main__":
     # It makes sense to have another class specifically as an interface for plotting
 
     # So at the very least I should have one more class for reading in xlsx and cleaning the data
-    basic_graph(result)
+    # print(network.df.to_markdown())
+    # basic_graph(result)
