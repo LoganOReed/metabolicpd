@@ -8,9 +8,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import scipy.integrate as scp
+import seaborn as sns
 
-# import seaborn as sns
-is_logging = False
+is_logging = True
 log_to_stream = False
 
 # Setup for always logging to file and logging to stream when level at warning
@@ -262,7 +262,6 @@ class LIFE_Network:
             s_matrix.append(col)
         return np.array(s_matrix).T
 
-    # @ct.Timer(name="__s_function", text="{name} time: {:.4f} seconds")
     def __s_function(self, t, x):
         fixed_idx = self.df[self.df["fixed"]].index.to_numpy()
         der = np.matmul(self.create_S_matrix(x), self.flux)
@@ -293,9 +292,18 @@ class LIFE_Network:
         idxs = self.df[self.df["name"].isin(mtbs)].index.to_numpy()
         self.mass[idxs] = vals
 
+    # TODO: Clean up this function
+    def get_names(self):
+        return self.df["name"]
+
 
 # TODO: Generalize this and give docstring
 def basic_graph(result):
+    sns.set_theme()
+    sns.set_style("dark")
+    sns.color_palette("pastel")
+    sns.set_context("talk")
+    # sns.despine(offset=10, trim=True)
     metas_to_plot = [
         "a_syn_0",
         "a_syn_1",
@@ -315,6 +323,7 @@ def basic_graph(result):
     plt.ylim([0, 3])
     plt.xlabel("$t$")  # the horizontal axis represents the time
     plt.legend()  # show how the colors correspond to the components of X
+    sns.despine(offset=10, trim=True)
     plt.show()
 
 
@@ -336,6 +345,7 @@ if __name__ == "__main__":
     # TODO: make a list of a couple interesting argument values for test cases
     # TODO: design dataframe for outputting simulation results
     # TODO: Write function that saves resultant data to file
+    # TODO: Rewrite create_S_matrix to vectorize the row operations
     network = LIFE_Network(
         file="data/simple_pd_network.xlsx",
         mass=None,  # Makes the masses random via constructor
@@ -357,11 +367,20 @@ if __name__ == "__main__":
     result = network.simulate(0, 12)
     logger.warning(result.message)
 
+    # Create and print results to file
+    respr = pd.DataFrame(result.y.T, columns=network.get_names())
+    respr.insert(0, "time", result.t)
+    respr.to_csv("data/results.csv")
+
     # takes in xlsx, (optional) initial mass/flux, (optional) simulation time
     # gives result of simulation, interfaces for plotting/saving/analysing
 
     # It makes sense to have another class specifically as an interface for plotting
 
     # So at the very least I should have one more class for reading in xlsx and cleaning the data
+    # This shows every metabolite
+    # sns.lineplot(data=respr)
+    # plt.show()
+
     # print(network.df.to_markdown())
-    # basic_graph(result)
+    basic_graph(result)
