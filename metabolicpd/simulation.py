@@ -269,13 +269,17 @@ class LIFE_Network:
         der[fixed_idx] = 0.0
         return der
 
-    def simulate(self, t_0, t):
+    # TODO: Look into switching to scipy.integrate.RK45 explicity
+    # Allows access to step function which would make setting specific values easier
+    def simulate(self, t_0, t, rtol=1e-4, atol=1e-5):
         """Runs the simulation."""
         sol = scp.solve_ivp(
             self.__s_function,
             (t_0, t),
             self.mass,
             t_eval=np.linspace(t_0, t),
+            rtol=rtol,
+            atol=atol,
         )
         return sol
 
