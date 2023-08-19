@@ -146,6 +146,9 @@ class LIFE_Network:
         else:
             self.source_weights = source_weights
 
+        # Create member dict for potential fixed metabolites
+        self.fixed_trajectories = {}
+
         self.substrates = []
         self.substrates_sources = []
         self.products = []
@@ -266,35 +269,40 @@ class LIFE_Network:
         fixed_idx = self.df[self.df["fixed"]].index.to_numpy()
         der = np.matmul(self.create_S_matrix(x), self.flux)
         # set to zero bevause its the der and we want it constant
-        der[fixed_idx] = 0.0
+        for i in fixed_idx:
+            der[i] = self.fixed_trajectories[i](t)
         return der
 
     # TODO: Look into switching to scipy.integrate.RK45 explicity
     # Allows access to step function which would make setting specific values easier
-    def simulate(self, t_0, t, rtol=1e-4, atol=1e-5):
+    # rough comments until I know things work
+    # t_0 : start, t: end, t_eval: list of points between t_0,t that the func will evaluate at.
+    def simulate(self, t_0, t, t_eval=None, rtol=1e-4, atol=1e-5):
         """Runs the simulation."""
         sol = scp.solve_ivp(
             self.__s_function,
             (t_0, t),
             self.mass,
-            t_eval=np.linspace(t_0, t),
+            t_eval=t_eval,
             rtol=rtol,
             atol=atol,
         )
         return sol
 
-    # TODO: Right now the vals need to be ordered by the
-    # index not the order the names are entered in
-    def fixMetabolites(self, mtbs, vals):
-        """Sets fixed flag to true and mass value to val."""
-        self.df.loc[self.df["name"].isin(mtbs), ["fixed"]] = True
-        idxs = self.df[self.df["name"].isin(mtbs)].index.to_numpy()
-        self.mass[idxs] = vals
+    # I'm so sorry for writing this horrible code
+    def fixMetabolite(self, mtb, val, der=lambda x: 0):
+        """Sets fixed flag to true and mass value to init val, and gives a derivative function for the trajectory."""
+        self.df.loc[self.df["name"].isin([mtb]), ["fixed"]] = True
+        idx = self.df[self.df["name"].isin([mtb])].index.to_numpy()
+        self.mass[idx] = val
+        self.fixed_trajectories[idx[0]] = der
 
-    def setInitialValue(self, mtbs, vals):
+    def setInitialValue(self, mtb, val):
         """Sets mass value to vals."""
-        idxs = self.df[self.df["name"].isin(mtbs)].index.to_numpy()
-        self.mass[idxs] = vals
+        # All of the lines that look like below are temporary hopefully
+        # (From Switching to singleton mtb instead of lists)
+        idx = self.df[self.df["name"].isin([mtb])].index.to_numpy()
+        self.mass[idx] = val
 
     # TODO: Clean up this function
     def get_names(self):
@@ -363,12 +371,17 @@ if __name__ == "__main__":
     # the masses need to be in the order of indices not the order of metabolite names
     # network.fixMetabolites(["gba_0", "clearance_0"], [0.0, 2.5])
     # To match old simulation example
-    network.fixMetabolites(["gba_0"], [2.5])
+
+    network.fixMetabolite("gba_0", [2.5], lambda x: -np.sin(x))
+    # Old way
+    # network.fixMetabolites(["gba_0"], [2.5])
     network.setInitialValue(["clearance_0"], [0.0])
     # TODO: Write code to output run time for simulation
     # cProfile.run('network.simulate(0, 12)')
 
-    result = network.simulate(0, 12)
+    t_0 = 0
+    t = 15
+    result = network.simulate(t_0, t, np.linspace(t_0, t))
     logger.warning(result.message)
 
     # Create and print results to file
