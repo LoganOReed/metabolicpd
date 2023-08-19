@@ -5,6 +5,8 @@ import re
 
 import codetiming as ct
 import matplotlib.pyplot as plt
+
+# import numdifftools as nd
 import numpy as np
 import pandas as pd
 import scipy.integrate as scp
@@ -296,6 +298,22 @@ class LIFE_Network:
         idx = self.df[self.df["name"].isin([mtb])].index.to_numpy()
         self.mass[idx] = val
         self.fixed_trajectories[idx[0]] = der
+
+    # I'm so sorry for copying this horrible code
+    def fixMetabolitePosition(self, mtb, val, pos=None):
+        """Sets fixed flag to true and mass value to init val, and gives a derivative function for the trajectory."""
+        if pos is None:
+
+            def pos(x):
+                val
+
+        self.df.loc[self.df["name"].isin([mtb]), ["fixed"]] = True
+        idx = self.df[self.df["name"].isin([mtb])].index.to_numpy()
+        self.mass[idx] = val
+        # self.fixed_trajectories[idx[0]] = der
+        # TODO: Restructure derivative version to give array of der values at eval_t instead of a function
+        # Use NumDiffTools to take a pos function (or list) and create der list for simulation
+        # https://numdifftools.readthedocs.io/en/latest/topics/finite_difference_derivatives.html#
 
     def setInitialValue(self, mtb, val):
         """Sets mass value to vals."""
