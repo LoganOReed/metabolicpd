@@ -5,8 +5,6 @@ import re
 
 import codetiming as ct
 import matplotlib.pyplot as plt
-
-# import numdifftools as nd
 import numpy as np
 import pandas as pd
 import scipy.integrate as scp
@@ -256,8 +254,6 @@ class LIFE_Network:
                 if self.substrates_sources[row_index]:
                     # NOTE: Implementation assumes source edges are simple diredges,
                     #       since networks can always be converted to this form
-                    # TODO: Implement function which converts network to this form
-                    # The prev todo probably isn't going to be super useful
                     col[idxp] = self.source_weights[idxp]
                 elif self.products_sinks[row_index]:
                     col[idxs] = -1 * mass[idxs] * uber_term
@@ -292,28 +288,14 @@ class LIFE_Network:
         return sol
 
     # I'm so sorry for writing this horrible code
+    # NOTE: I Attempted to write an equivalent function when given a position function
+    # but it ran for more than a minute and a half without any results.
     def fixMetabolite(self, mtb, val, der=lambda x: 0):
         """Sets fixed flag to true and mass value to init val, and gives a derivative function for the trajectory."""
         self.df.loc[self.df["name"].isin([mtb]), ["fixed"]] = True
         idx = self.df[self.df["name"].isin([mtb])].index.to_numpy()
-        self.mass[idx] = val
+        self.mass[idx[0]] = val
         self.fixed_trajectories[idx[0]] = der
-
-    # I'm so sorry for copying this horrible code
-    def fixMetabolitePosition(self, mtb, val, pos=None):
-        """Sets fixed flag to true and mass value to init val, and gives a derivative function for the trajectory."""
-        if pos is None:
-
-            def pos(x):
-                val
-
-        self.df.loc[self.df["name"].isin([mtb]), ["fixed"]] = True
-        idx = self.df[self.df["name"].isin([mtb])].index.to_numpy()
-        self.mass[idx] = val
-        # self.fixed_trajectories[idx[0]] = der
-        # TODO: Restructure derivative version to give array of der values at eval_t instead of a function
-        # Use NumDiffTools to take a pos function (or list) and create der list for simulation
-        # https://numdifftools.readthedocs.io/en/latest/topics/finite_difference_derivatives.html#
 
     def setInitialValue(self, mtb, val):
         """Sets mass value to vals."""
@@ -390,7 +372,7 @@ if __name__ == "__main__":
     # network.fixMetabolites(["gba_0", "clearance_0"], [0.0, 2.5])
     # To match old simulation example
 
-    network.fixMetabolite("gba_0", [2.5], lambda x: -np.sin(x))
+    network.fixMetabolite("gba_0", 2.5, lambda x: -np.sin(x))
     # Old way
     # network.fixMetabolites(["gba_0"], [2.5])
     network.setInitialValue(["clearance_0"], [0.0])
