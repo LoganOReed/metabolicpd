@@ -124,7 +124,7 @@ class LIFE_Network:
             self.num_mtb,
             dtype={
                 "names": ("name", "type", "fixed", "index"),
-                "formats": ("U32", "U6", "bool", "i4"),
+                "formats": ("<U32", "<U6", "bool", "<i4"),
             },
         )
         self.mtb["name"] = new_unique_metabolites
@@ -165,6 +165,10 @@ class LIFE_Network:
         # Create member dict for potential fixed metabolites
         self.fixed_trajectories = {}
 
+        self.hyper_edges = np.zeros((self.network.shape[0], self.num_mtb))
+        self.source_edges = np.zeros((self.network.shape[0], self.num_mtb))
+        uber_mods = np.zeros((self.network.shape[0], self.num_mtb))
+
         self.substrates = []
         self.substrates_sources = []
         self.products = []
@@ -175,7 +179,20 @@ class LIFE_Network:
         # TODO: Check with Chris that generating this once will not break edge cases
         # TODO: Check if columns will always be in this order
         for row in self.network[["tail", "head", "uber"]].itertuples():
+            row_idx = row.Index
             sub_str = self.mtb[np.isin(self.mtb["name"], row.tail.split(", "))]["index"]
+            prod_snk = self.mtb[np.isin(self.mtb["name"], row.head.split(", "))][
+                "index"
+            ]
+
+            if self.mtb[sub_str[0]]["type"] == "source":
+                self.source_edges[row_idx, prod_snk] = self.source_weights[sub_str[0]]
+            elif self.mtb[prod_snk[0]]["type"] == "source":
+                self.hyper_edges[row_idx, prod_snk] = 0
+                self.hyper_edges[row_idx, sub_str] = -1
+            else:
+                self.hyper_edges[row_idx, sub_str] = -1
+                self.hyper_edges[row_idx, prod_snk] = 1
 
             self.substrates.append(sub_str)
             if len(sub_str) != 1:
@@ -185,13 +202,10 @@ class LIFE_Network:
             else:
                 self.substrates_sources.append(False)
 
-            prod_snk = self.mtb[np.isin(self.mtb["name"], row.head.split(", "))][
-                "index"
-            ]
             self.products.append(prod_snk)
             if len(prod_snk) != 1:
                 self.products_sinks.append(False)
-            elif self.mtb[prod_snk[0]]["type"] == "source":
+            elif self.mtb[prod_snk[0]]["type"] == "sink":
                 self.products_sinks.append(True)
             else:
                 self.products_sinks.append(False)
@@ -201,21 +215,31 @@ class LIFE_Network:
                     np.isin(self.mtb["name"], [s[:-2] for s in row.uber.split(", ")])
                 ]["index"]
             )
-            # self.uber_modulators.append(
-            #     self.df[
-            #         self.df["name"].isin([s[:-2] for s in row.uber.split(", ")])
-            #     ].index.tolist()
-            # )
+
             u_m = row.uber.split(", ")
             u_m_s = []
             for uber in u_m:
                 # there should probably be some checking that happens so we don't duplicate the code in the if statements
                 if uber[-1] == "+":  # check the last term in the entry, enhancer
                     u_m_s.append(True)
+                    uber_mods[
+                        row.Index, self.mtb[self.mtb["name"] == uber[:-2]]["index"]
+                    ] = 1
                 elif uber[-1] == "-":  # check the last term in the entry, enhancer
                     u_m_s.append(False)
-            self.uber_modulator_signs.append(u_m_s)
+                    uber_mods[
+                        row.Index, self.mtb[self.mtb["name"] == uber[:-2]]["index"]
+                    ] = -1
+            self.uber_modulator_signs.append(np.array(u_m_s, dtype="bool"))
 
+        self.uber_enhancers = np.nonzero(uber_mods == 1)
+        self.uber_inhibiters = np.nonzero(uber_mods == -1)
+        # print(pd.DataFrame(self.hyper_edges))
+        # print(pd.DataFrame(self.source_edges))
+        # print("THISIDSJFDFJLDJSF")
+        # print(pd.DataFrame(uber_mods))
+        # print(self.uber_enhancers)
+        # print(self.uber_inhibiters)
         # print(self.substrates)
         # print(self.substrates_sources)
         # print(self.products)
@@ -238,6 +262,30 @@ class LIFE_Network:
             A numpy array representing the S matrix for the current metabolite masses.
         """
         s_matrix = []
+        mass_diag = np.zeros((28, 28))
+
+        u_t = np.zeros(28)
+        u_t.fill(1.0)
+        for i in range(len(self.uber_enhancers[0])):
+            u_t[self.uber_enhancers[0][i]] = u_t[
+                self.uber_enhancers[0][i]
+            ] * self.ffunc(mass, self.uber_enhancers[1][i])
+
+        for i in range(len(self.uber_inhibiters[0])):
+            u_t[self.uber_inhibiters[0][i]] = u_t[
+                self.uber_inhibiters[0][i]
+            ] / self.ffunc(mass, self.uber_inhibiters[1][i])
+
+        uber_diag = np.diagflat(u_t)
+
+        # Temp import from old method for testing
+        for row in self.network[["tail", "head", "uber"]].itertuples():
+            row_index = row.Index
+            idxs = self.substrates[row_index]
+            min_sub = self.min_func(mass, idxs)
+            mass_diag[row_index, row_index] = min_sub
+
+        # OLD BELOW
         # TODO: Check if columns will always be in this order
         for row in self.network[["tail", "head", "uber"]].itertuples():
             # iterate through each of the edges
@@ -267,16 +315,15 @@ class LIFE_Network:
 
             # Note that I'm vectorizing as much as possible as the actual dataframe will be massive.
             # Also note that I pulled as much as possible out of the function as its called every time simulate() iterates
-            # idxs = np.array(self.substrates[row_index])
-            # idxp = np.array(self.products[row_index])
             idxs = self.substrates[row_index]
             idxp = self.products[row_index]
+            min_sub = self.min_func(mass, idxs)
             # Case: Hyperedge
             if len(idxs) > 1 or len(idxp) > 1:
                 # This chunk of code finds min, and sets col values for both substrates and products appropriately
-                min_sub = self.min_func(mass, idxs)
                 col[idxs] = -1 * min_sub * uber_term
                 col[idxp] = min_sub * uber_term
+                # mass_diag[row_index, row_index] = min_sub
             # Case: Not Hyperedge
             else:
                 if self.substrates_sources[row_index]:
@@ -288,8 +335,15 @@ class LIFE_Network:
                 else:
                     col[idxs] = -1 * mass[idxs] * uber_term
                     col[idxp] = mass[idxs] * uber_term
+                # mass_diag[row_index, row_index] = mass[idxs[0]]
             s_matrix.append(col)
-        return np.array(s_matrix).T
+            mass_diag[row_index, row_index] = min_sub
+        # print("MATRIX VERSION")
+        # print(pd.DataFrame((uber_diag@mass_diag)@self.hyper_edges + self.source_edges))
+        # print("OLD VERSION")
+        # print(pd.DataFrame(np.array(s_matrix)))
+        # return np.array(s_matrix).T
+        return ((uber_diag @ mass_diag) @ self.hyper_edges + self.source_edges).T
 
     def __s_function(self, t, x):
         fixed_idx = self.mtb[self.mtb["fixed"]]["index"]
@@ -332,11 +386,8 @@ class LIFE_Network:
 
         self.mass[idx] = val
         if trajectory is None:
-            trajectory = self.t_eval.copy()
-            if isDerivative:
-                trajectory = trajectory.fill(0.0)
-            else:
-                trajectory = trajectory.fill(val)
+            trajectory = np.zeros(self.num_samples)
+            isDerivative = True
         else:
             # convert function to ndarray if needed
             if type(trajectory) is not np.ndarray:
@@ -406,6 +457,8 @@ if __name__ == "__main__":
     # TODO: Write function that saves resultant data to file
     # TODO: Rewrite create_S_matrix to vectorize the row operations
 
+    pd.set_option("display.precision", 2)
+
     network = LIFE_Network(
         file="data/simple_pd_network.xlsx",
         mass=None,  # Makes the masses random via constructor
@@ -418,9 +471,10 @@ if __name__ == "__main__":
     )
 
     # setting trajectory using ndarray
-    network.fixMetabolite("gba_0", 2.5, -np.sin(network.t_eval), isDerivative=True)
+    # network.fixMetabolite("gba_0", 2.5, -np.sin(network.t_eval), isDerivative=True)
+    network.fixMetabolite("gba_0", 2.5)
     # setting trajectory using ufunc
-    network.fixMetabolite("a_syn_0", 1.5, np.cos)
+    # network.fixMetabolite("a_syn_0", 1.5)
     # Set initial value without fixing metabolite
     network.setInitialValue("clearance_0", 0.0)
 
