@@ -101,8 +101,7 @@ class LIFE_Network:
             for ele in elements:
                 metabolites.append(ele)
         new_unique_metabolites = list(dict.fromkeys(metabolites))
-        self.index_to_name = np.array(new_unique_metabolites)
-        self.name_to_index = dict(zip(metabolites, np.arange(len(metabolites))))
+        self.num_mtb = len(new_unique_metabolites)
 
         # Use names to determine type of metabolites
         metabolite_types = []
@@ -120,19 +119,22 @@ class LIFE_Network:
                 metabolite_types.append("source")
             else:  # if we didn't find a source or sink term, then it must be an actual metabolite!
                 metabolite_types.append("actual")
-        self.metabolite_type = np.array(metabolite_types)
 
-        # use previous lists to construct dictionary which will be used in DataFrame construction
-        temp_dict = {
-            "name": new_unique_metabolites,
-            "type": metabolite_types,
-            "fixed": False,
-        }
-        self.df = pd.DataFrame(temp_dict)
+        self.mtb = np.zeros(
+            self.num_mtb,
+            dtype={
+                "names": ("name", "type", "fixed", "index"),
+                "formats": ("U32", "U6", "bool", "i4"),
+            },
+        )
+        self.mtb["name"] = new_unique_metabolites
+        self.mtb["type"] = metabolite_types
+        self.mtb["fixed"] = False
+        self.mtb["index"] = np.arange(len(new_unique_metabolites))
 
         if mass is None:
             np.random.default_rng()
-            self.mass = np.random.rand(len(self.df.index))
+            self.mass = np.random.rand(self.num_mtb)
         else:
             self.mass = mass
 
@@ -154,7 +156,7 @@ class LIFE_Network:
         # TODO: Come up with input that is easier for user
         if source_weights is None:
             temp_list = []
-            for i in range(len(self.df.index)):
+            for i in range(self.num_mtb):
                 temp_list.append(1)
             self.source_weights = np.array(temp_list)
         else:
@@ -173,31 +175,37 @@ class LIFE_Network:
         # TODO: Check with Chris that generating this once will not break edge cases
         # TODO: Check if columns will always be in this order
         for row in self.network[["tail", "head", "uber"]].itertuples():
-            sub_str = self.df[self.df["name"].isin(row.tail.split(", "))].index.tolist()
+            sub_str = self.mtb[np.isin(self.mtb["name"], row.tail.split(", "))]["index"]
+
             self.substrates.append(sub_str)
             if len(sub_str) != 1:
                 self.substrates_sources.append()
-            elif self.df.loc[self.df.index[sub_str[0]], "type"] == "source":
+            elif self.mtb[sub_str[0]]["type"] == "source":
                 self.substrates_sources.append(True)
             else:
                 self.substrates_sources.append(False)
 
-            prod_snk = self.df[
-                self.df["name"].isin(row.head.split(", "))
-            ].index.tolist()
+            prod_snk = self.mtb[np.isin(self.mtb["name"], row.head.split(", "))][
+                "index"
+            ]
             self.products.append(prod_snk)
             if len(prod_snk) != 1:
                 self.products_sinks.append(False)
-            elif self.df.loc[self.df.index[prod_snk[0]], "type"] == "sink":
+            elif self.mtb[prod_snk[0]]["type"] == "source":
                 self.products_sinks.append(True)
             else:
                 self.products_sinks.append(False)
 
             self.uber_modulators.append(
-                self.df[
-                    self.df["name"].isin([s[:-2] for s in row.uber.split(", ")])
-                ].index.tolist()
+                self.mtb[
+                    np.isin(self.mtb["name"], [s[:-2] for s in row.uber.split(", ")])
+                ]["index"]
             )
+            # self.uber_modulators.append(
+            #     self.df[
+            #         self.df["name"].isin([s[:-2] for s in row.uber.split(", ")])
+            #     ].index.tolist()
+            # )
             u_m = row.uber.split(", ")
             u_m_s = []
             for uber in u_m:
@@ -207,6 +215,13 @@ class LIFE_Network:
                 elif uber[-1] == "-":  # check the last term in the entry, enhancer
                     u_m_s.append(False)
             self.uber_modulator_signs.append(u_m_s)
+
+        # print(self.substrates)
+        # print(self.substrates_sources)
+        # print(self.products)
+        # print(self.products_sinks)
+        # print(self.uber_modulators)
+        # print(self.uber_modulator_signs)
 
     # NOTE: I've set this up so ideally it will only be called by the "simulation" function once written
     # TODO: Write Documentation for new member variables, write example use case
@@ -230,7 +245,7 @@ class LIFE_Network:
             # or product! (for instance, in a hyperedge)
 
             row_index = row.Index
-            col = np.zeros(self.df.shape[0])
+            col = np.zeros(self.num_mtb)
 
             # build the uber term for each expression, default if no uber edges is 1
             uber_term = 1.0
@@ -277,7 +292,7 @@ class LIFE_Network:
         return np.array(s_matrix).T
 
     def __s_function(self, t, x):
-        fixed_idx = self.df[self.df["fixed"]].index.to_numpy()
+        fixed_idx = self.mtb[self.mtb["fixed"]]["index"]
         der = np.matmul(self.create_S_matrix(x), self.flux)
         # set to zero bevause its the der and we want it constant
         for i in fixed_idx:
@@ -307,9 +322,15 @@ class LIFE_Network:
     @conditional_timer("fixMetabolite")
     def fixMetabolite(self, mtb, val, trajectory=None, isDerivative=False):
         """Sets fixed flag to true and mass value to init val, and gives a derivative function for the trajectory."""
-        self.df.loc[self.df["name"].isin([mtb]), ["fixed"]] = True
-        idx = self.df[self.df["name"].isin([mtb])].index.to_numpy()
-        self.mass[idx[0]] = val
+        # TEMP
+        # self.df.loc[self.df["name"].isin([mtb]), ["fixed"]] = True
+        # Need to be careful to have a scalar index instead of an array to view data instead of copy
+        idx = self.mtb[self.mtb["name"] == mtb]["index"][0]
+        f_mtb = self.mtb[idx]
+        f_mtb["fixed"] = True
+        # idx = self.df[self.df["name"].isin([mtb])].index.to_numpy()
+
+        self.mass[idx] = val
         if trajectory is None:
             trajectory = self.t_eval.copy()
             if isDerivative:
@@ -324,7 +345,7 @@ class LIFE_Network:
         if not isDerivative:
             trajectory = np.diff(trajectory) / self.step_size
 
-        self.fixed_trajectories[idx[0]] = lambda t: trajectory[
+        self.fixed_trajectories[idx] = lambda t: trajectory[
             int(min(np.floor(t / self.step_size), self.num_samples - 2))
         ]
 
@@ -332,12 +353,8 @@ class LIFE_Network:
         """Sets mass value to vals."""
         # All of the lines that look like below are temporary hopefully
         # (From Switching to singleton mtb instead of lists)
-        idx = self.df[self.df["name"].isin([mtb])].index.to_numpy()
+        idx = self.mtb[self.mtb["name"] == mtb]["index"][0]
         self.mass[idx] = val
-
-    # TODO: Clean up this function
-    def get_names(self):
-        return self.df["name"]
 
 
 # TODO: Generalize this and give docstring
@@ -411,12 +428,12 @@ if __name__ == "__main__":
     logger.warning(result.message)
 
     # Create and print results to file
-    respr = pd.DataFrame(result.y.T, columns=network.get_names())
+    respr = pd.DataFrame(result.y.T, columns=network.mtb["name"])
     respr.insert(0, "time", result.t)
     respr.to_csv("data/results.csv")
 
     # takes in xlsx, (optional) initial mass/flux, (optional) simulation time
     # gives result of simulation, interfaces for plotting/saving/analysing
 
-    print(network.df.to_markdown())
+    # print(network.mtb)
     basic_graph(result)

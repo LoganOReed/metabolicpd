@@ -39203,3 +39203,311 @@
 08/22/2023 03:44:35 AM fixMetabolite time: 0.0007 seconds
 08/22/2023 03:44:35 AM simulate time: 0.2956 seconds
 08/22/2023 03:44:35 AM The solver successfully reached the end of the integration interval.
+08/22/2023 03:48:16 AM __init__ time: 0.0696 seconds
+08/22/2023 03:48:16 AM fixMetabolite time: 0.0009 seconds
+08/22/2023 03:48:16 AM fixMetabolite time: 0.0007 seconds
+08/22/2023 03:48:16 AM simulate time: 0.0009 seconds
+08/22/2023 03:48:50 AM __init__ time: 0.0691 seconds
+08/22/2023 03:48:50 AM fixMetabolite time: 0.0011 seconds
+08/22/2023 03:48:50 AM fixMetabolite time: 0.0009 seconds
+08/22/2023 03:48:51 AM simulate time: 0.2629 seconds
+08/22/2023 03:48:51 AM The solver successfully reached the end of the integration interval.
+08/22/2023 03:49:24 AM __init__ time: 0.0699 seconds
+08/22/2023 03:49:24 AM fixMetabolite time: 0.0009 seconds
+08/22/2023 03:49:24 AM fixMetabolite time: 0.0008 seconds
+08/22/2023 03:49:25 AM simulate time: 0.2748 seconds
+08/22/2023 03:49:25 AM The solver successfully reached the end of the integration interval.
+08/22/2023 03:50:02 AM __init__ time: 0.0700 seconds
+08/22/2023 03:50:02 AM fixMetabolite time: 0.0010 seconds
+08/22/2023 03:50:02 AM fixMetabolite time: 0.0009 seconds
+08/22/2023 03:50:02 AM simulate time: 0.2853 seconds
+08/22/2023 03:50:02 AM The solver successfully reached the end of the integration interval.
+08/22/2023 03:50:29 AM __init__ time: 0.0692 seconds
+08/22/2023 03:50:29 AM fixMetabolite time: 0.0008 seconds
+08/22/2023 03:50:29 AM fixMetabolite time: 0.0007 seconds
+08/22/2023 03:50:29 AM simulate time: 0.2791 seconds
+08/22/2023 03:50:29 AM The solver successfully reached the end of the integration interval.
+08/22/2023 03:53:30 AM __init__ time: 0.0581 seconds
+08/22/2023 03:53:56 AM __init__ time: 0.0582 seconds
+08/22/2023 04:21:19 AM __init__ time: 0.0696 seconds
+08/22/2023 04:21:19 AM fixMetabolite time: 0.0009 seconds
+08/22/2023 04:21:19 AM fixMetabolite time: 0.0014 seconds
+08/22/2023 04:21:19 AM simulate time: 0.2809 seconds
+08/22/2023 04:21:19 AM The solver successfully reached the end of the integration interval.
+08/22/2023 04:26:54 AM __init__ time: 0.0579 seconds
+08/22/2023 04:27:42 AM __init__ time: 0.0689 seconds
+08/22/2023 04:27:42 AM fixMetabolite time: 0.0009 seconds
+08/22/2023 04:27:42 AM fixMetabolite time: 0.0008 seconds
+08/22/2023 04:27:42 AM simulate time: 0.2761 seconds
+08/22/2023 04:27:42 AM The solver successfully reached the end of the integration interval.
+08/22/2023 04:47:08 AM __init__ time: 0.0733 seconds
+08/22/2023 04:47:08 AM fixMetabolite time: 0.0009 seconds
+08/22/2023 04:47:08 AM fixMetabolite time: 0.0009 seconds
+08/22/2023 04:47:08 AM simulate time: 0.2560 seconds
+08/22/2023 04:47:08 AM The solver successfully reached the end of the integration interval.
+08/22/2023 04:49:56 AM __init__ time: 0.0769 seconds
+08/22/2023 04:49:56 AM fixMetabolite time: 0.0010 seconds
+08/22/2023 04:49:56 AM fixMetabolite time: 0.0009 seconds
+08/22/2023 04:49:56 AM simulate time: 0.2652 seconds
+08/22/2023 04:49:56 AM The solver successfully reached the end of the integration interval.
+08/22/2023 04:50:13 AM __init__ time: 0.0754 seconds
+08/22/2023 04:50:13 AM fixMetabolite time: 0.0015 seconds
+08/22/2023 04:50:13 AM fixMetabolite time: 0.0012 seconds
+08/22/2023 04:50:13 AM simulate time: 0.2996 seconds
+08/22/2023 04:50:13 AM The solver successfully reached the end of the integration interval.
+08/22/2023 04:51:35 AM __init__ time: 0.0803 seconds
+08/22/2023 04:51:35 AM fixMetabolite time: 0.0014 seconds
+08/22/2023 04:51:35 AM fixMetabolite time: 0.0013 seconds
+08/22/2023 04:51:35 AM simulate time: 0.2347 seconds
+08/22/2023 04:51:35 AM The solver successfully reached the end of the integration interval.
+08/22/2023 04:52:41 AM __init__ time: 0.0772 seconds
+08/22/2023 04:52:41 AM fixMetabolite time: 0.0013 seconds
+08/22/2023 04:52:41 AM fixMetabolite time: 0.0013 seconds
+08/22/2023 04:52:41 AM simulate time: 0.2646 seconds
+08/22/2023 04:52:41 AM The solver successfully reached the end of the integration interval.
+08/22/2023 04:55:23 AM __init__ time: 0.0674 seconds
+08/22/2023 04:56:10 AM __init__ time: 0.0671 seconds
+08/22/2023 04:56:10 AM fixMetabolite time: 0.0009 seconds
+08/22/2023 04:56:10 AM fixMetabolite time: 0.0008 seconds
+08/22/2023 04:56:10 AM simulate time: 0.2794 seconds
+08/22/2023 04:56:10 AM The solver successfully reached the end of the integration interval.
+08/22/2023 04:59:41 AM __init__ time: 0.0686 seconds
+08/22/2023 04:59:41 AM fixMetabolite time: 0.0011 seconds
+08/22/2023 04:59:41 AM fixMetabolite time: 0.0011 seconds
+08/22/2023 04:59:41 AM simulate time: 0.3076 seconds
+08/22/2023 04:59:41 AM The solver successfully reached the end of the integration interval.
+08/22/2023 05:00:25 AM __init__ time: 0.0767 seconds
+08/22/2023 05:00:25 AM fixMetabolite time: 0.0015 seconds
+08/22/2023 05:00:25 AM fixMetabolite time: 0.0013 seconds
+08/22/2023 05:00:25 AM simulate time: 0.2742 seconds
+08/22/2023 05:00:25 AM The solver successfully reached the end of the integration interval.
+08/22/2023 05:01:35 AM __init__ time: 0.0585 seconds
+08/22/2023 05:01:48 AM __init__ time: 0.0679 seconds
+08/22/2023 05:01:48 AM fixMetabolite time: 0.0011 seconds
+08/22/2023 05:01:48 AM fixMetabolite time: 0.0009 seconds
+08/22/2023 05:01:49 AM simulate time: 0.2416 seconds
+08/22/2023 05:01:49 AM The solver successfully reached the end of the integration interval.
+08/22/2023 05:03:48 AM __init__ time: 0.0667 seconds
+08/22/2023 05:03:48 AM fixMetabolite time: 0.0009 seconds
+08/22/2023 05:03:48 AM fixMetabolite time: 0.0008 seconds
+08/22/2023 05:03:49 AM simulate time: 0.2518 seconds
+08/22/2023 05:03:49 AM The solver successfully reached the end of the integration interval.
+08/22/2023 05:03:59 AM __init__ time: 0.0668 seconds
+08/22/2023 05:03:59 AM fixMetabolite time: 0.0009 seconds
+08/22/2023 05:03:59 AM fixMetabolite time: 0.0008 seconds
+08/22/2023 05:03:59 AM simulate time: 0.2848 seconds
+08/22/2023 05:03:59 AM The solver successfully reached the end of the integration interval.
+08/22/2023 05:05:16 AM __init__ time: 0.0635 seconds
+08/22/2023 05:05:16 AM fixMetabolite time: 0.0009 seconds
+08/22/2023 05:05:16 AM fixMetabolite time: 0.0008 seconds
+08/22/2023 05:05:16 AM simulate time: 0.3014 seconds
+08/22/2023 05:05:16 AM The solver successfully reached the end of the integration interval.
+08/22/2023 05:06:31 AM __init__ time: 0.0620 seconds
+08/22/2023 05:06:31 AM fixMetabolite time: 0.0008 seconds
+08/22/2023 05:06:31 AM fixMetabolite time: 0.0008 seconds
+08/22/2023 05:06:31 AM simulate time: 0.2876 seconds
+08/22/2023 05:06:31 AM The solver successfully reached the end of the integration interval.
+08/22/2023 05:09:34 AM __init__ time: 0.0667 seconds
+08/22/2023 05:09:34 AM fixMetabolite time: 0.0011 seconds
+08/22/2023 05:09:34 AM fixMetabolite time: 0.0012 seconds
+08/22/2023 05:09:35 AM simulate time: 0.3227 seconds
+08/22/2023 05:09:35 AM The solver successfully reached the end of the integration interval.
+08/22/2023 05:10:17 AM __init__ time: 0.0699 seconds
+08/22/2023 05:10:17 AM fixMetabolite time: 0.0016 seconds
+08/22/2023 05:10:17 AM fixMetabolite time: 0.0013 seconds
+08/22/2023 05:10:18 AM simulate time: 0.2639 seconds
+08/22/2023 05:10:18 AM The solver successfully reached the end of the integration interval.
+08/22/2023 05:11:08 AM __init__ time: 0.0584 seconds
+08/22/2023 05:11:49 AM __init__ time: 0.0593 seconds
+08/22/2023 05:11:49 AM fixMetabolite time: 0.0010 seconds
+08/22/2023 05:11:49 AM fixMetabolite time: 0.0008 seconds
+08/22/2023 05:11:49 AM simulate time: 0.3020 seconds
+08/22/2023 05:11:49 AM The solver successfully reached the end of the integration interval.
+08/22/2023 05:12:13 AM __init__ time: 0.0596 seconds
+08/22/2023 05:12:13 AM fixMetabolite time: 0.0011 seconds
+08/22/2023 05:12:13 AM fixMetabolite time: 0.0009 seconds
+08/22/2023 05:12:13 AM simulate time: 0.2885 seconds
+08/22/2023 05:12:13 AM The solver successfully reached the end of the integration interval.
+08/22/2023 05:13:05 AM __init__ time: 0.0603 seconds
+08/22/2023 05:13:05 AM fixMetabolite time: 0.0011 seconds
+08/22/2023 05:13:05 AM fixMetabolite time: 0.0009 seconds
+08/22/2023 05:13:05 AM simulate time: 0.7097 seconds
+08/22/2023 05:13:05 AM The solver successfully reached the end of the integration interval.
+08/22/2023 05:13:19 AM __init__ time: 0.0585 seconds
+08/22/2023 05:13:19 AM fixMetabolite time: 0.0010 seconds
+08/22/2023 05:13:19 AM fixMetabolite time: 0.0008 seconds
+08/22/2023 05:13:20 AM simulate time: 0.6520 seconds
+08/22/2023 05:13:20 AM The solver successfully reached the end of the integration interval.
+08/22/2023 05:13:39 AM __init__ time: 0.0588 seconds
+08/22/2023 05:13:39 AM fixMetabolite time: 0.0010 seconds
+08/22/2023 05:13:39 AM fixMetabolite time: 0.0008 seconds
+08/22/2023 05:13:39 AM simulate time: 0.2658 seconds
+08/22/2023 05:13:39 AM The solver successfully reached the end of the integration interval.
+08/22/2023 05:14:14 AM __init__ time: 0.0590 seconds
+08/22/2023 05:14:14 AM fixMetabolite time: 0.0010 seconds
+08/22/2023 05:14:14 AM fixMetabolite time: 0.0009 seconds
+08/22/2023 05:14:14 AM simulate time: 0.3191 seconds
+08/22/2023 05:14:14 AM The solver successfully reached the end of the integration interval.
+08/22/2023 05:17:34 AM __init__ time: 0.0623 seconds
+08/22/2023 05:17:34 AM fixMetabolite time: 0.0011 seconds
+08/22/2023 05:17:34 AM fixMetabolite time: 0.0009 seconds
+08/22/2023 05:17:35 AM simulate time: 0.7108 seconds
+08/22/2023 05:17:35 AM The solver successfully reached the end of the integration interval.
+08/22/2023 05:18:12 AM __init__ time: 0.0582 seconds
+08/22/2023 05:18:12 AM fixMetabolite time: 0.0010 seconds
+08/22/2023 05:18:12 AM fixMetabolite time: 0.0008 seconds
+08/22/2023 05:18:12 AM simulate time: 0.7029 seconds
+08/22/2023 05:18:12 AM The solver successfully reached the end of the integration interval.
+08/22/2023 05:18:19 AM __init__ time: 0.0584 seconds
+08/22/2023 05:18:19 AM fixMetabolite time: 0.0011 seconds
+08/22/2023 05:18:19 AM fixMetabolite time: 0.0008 seconds
+08/22/2023 05:18:19 AM simulate time: 0.3996 seconds
+08/22/2023 05:18:19 AM The solver successfully reached the end of the integration interval.
+08/22/2023 05:19:07 AM __init__ time: 0.0585 seconds
+08/22/2023 05:19:07 AM fixMetabolite time: 0.0010 seconds
+08/22/2023 05:19:07 AM fixMetabolite time: 0.0008 seconds
+08/22/2023 05:19:07 AM simulate time: 0.6124 seconds
+08/22/2023 05:19:07 AM The solver successfully reached the end of the integration interval.
+08/22/2023 05:20:42 AM __init__ time: 0.0586 seconds
+08/22/2023 05:20:42 AM fixMetabolite time: 0.0011 seconds
+08/22/2023 05:20:42 AM fixMetabolite time: 0.0008 seconds
+08/22/2023 05:20:43 AM simulate time: 0.6871 seconds
+08/22/2023 05:20:43 AM The solver successfully reached the end of the integration interval.
+08/22/2023 05:21:34 AM __init__ time: 0.0583 seconds
+08/22/2023 05:21:34 AM fixMetabolite time: 0.0011 seconds
+08/22/2023 05:21:34 AM fixMetabolite time: 0.0009 seconds
+08/22/2023 05:21:34 AM simulate time: 0.6103 seconds
+08/22/2023 05:21:34 AM The solver successfully reached the end of the integration interval.
+08/22/2023 05:26:33 AM __init__ time: 0.0585 seconds
+08/22/2023 05:26:33 AM fixMetabolite time: 0.0011 seconds
+08/22/2023 05:26:33 AM fixMetabolite time: 0.0009 seconds
+08/22/2023 05:26:33 AM simulate time: 0.6256 seconds
+08/22/2023 05:26:33 AM The solver successfully reached the end of the integration interval.
+08/22/2023 05:27:10 AM __init__ time: 0.0592 seconds
+08/22/2023 05:27:10 AM fixMetabolite time: 0.0012 seconds
+08/22/2023 05:27:10 AM fixMetabolite time: 0.0009 seconds
+08/22/2023 05:27:17 AM simulate time: 7.2265 seconds
+08/22/2023 05:27:20 AM __init__ time: 0.0596 seconds
+08/22/2023 05:27:20 AM fixMetabolite time: 0.0011 seconds
+08/22/2023 05:27:20 AM fixMetabolite time: 0.0009 seconds
+08/22/2023 05:27:20 AM simulate time: 0.6287 seconds
+08/22/2023 05:27:20 AM The solver successfully reached the end of the integration interval.
+08/22/2023 05:30:28 AM __init__ time: 0.0581 seconds
+08/22/2023 05:30:28 AM fixMetabolite time: 0.0012 seconds
+08/22/2023 05:30:28 AM fixMetabolite time: 0.0009 seconds
+08/22/2023 05:30:28 AM simulate time: 0.6429 seconds
+08/22/2023 05:30:28 AM The solver successfully reached the end of the integration interval.
+08/22/2023 05:30:47 AM __init__ time: 0.0581 seconds
+08/22/2023 05:30:47 AM fixMetabolite time: 0.0011 seconds
+08/22/2023 05:30:47 AM fixMetabolite time: 0.0009 seconds
+08/22/2023 05:30:48 AM simulate time: 0.6002 seconds
+08/22/2023 05:30:48 AM The solver successfully reached the end of the integration interval.
+08/22/2023 05:32:14 AM __init__ time: 0.0585 seconds
+08/22/2023 05:32:14 AM fixMetabolite time: 0.0012 seconds
+08/22/2023 05:32:14 AM fixMetabolite time: 0.0010 seconds
+08/22/2023 05:32:15 AM simulate time: 0.6563 seconds
+08/22/2023 05:32:15 AM The solver successfully reached the end of the integration interval.
+08/22/2023 05:32:57 AM __init__ time: 0.0580 seconds
+08/22/2023 05:32:57 AM fixMetabolite time: 0.0015 seconds
+08/22/2023 05:32:57 AM fixMetabolite time: 0.0012 seconds
+08/22/2023 05:32:57 AM simulate time: 0.6538 seconds
+08/22/2023 05:32:57 AM The solver successfully reached the end of the integration interval.
+08/22/2023 05:35:46 AM __init__ time: 0.0584 seconds
+08/22/2023 05:35:46 AM fixMetabolite time: 0.0015 seconds
+08/22/2023 05:35:46 AM fixMetabolite time: 0.0012 seconds
+08/22/2023 05:35:47 AM simulate time: 0.6868 seconds
+08/22/2023 05:35:47 AM The solver successfully reached the end of the integration interval.
+08/22/2023 05:36:09 AM __init__ time: 0.0587 seconds
+08/22/2023 05:36:09 AM fixMetabolite time: 0.0015 seconds
+08/22/2023 05:36:09 AM fixMetabolite time: 0.0012 seconds
+08/22/2023 05:36:10 AM simulate time: 0.7199 seconds
+08/22/2023 05:36:10 AM The solver successfully reached the end of the integration interval.
+08/22/2023 05:36:44 AM __init__ time: 0.0587 seconds
+08/22/2023 05:36:44 AM fixMetabolite time: 0.0014 seconds
+08/22/2023 05:36:44 AM fixMetabolite time: 0.0011 seconds
+08/22/2023 05:36:45 AM simulate time: 0.6884 seconds
+08/22/2023 05:36:45 AM The solver successfully reached the end of the integration interval.
+08/22/2023 05:37:47 AM __init__ time: 0.0583 seconds
+08/22/2023 05:37:47 AM fixMetabolite time: 0.0015 seconds
+08/22/2023 05:37:47 AM fixMetabolite time: 0.0011 seconds
+08/22/2023 05:37:48 AM simulate time: 0.5589 seconds
+08/22/2023 05:37:48 AM The solver successfully reached the end of the integration interval.
+08/22/2023 05:39:39 AM __init__ time: 0.0580 seconds
+08/22/2023 05:39:39 AM fixMetabolite time: 0.0008 seconds
+08/22/2023 05:39:47 AM __init__ time: 0.0584 seconds
+08/22/2023 05:39:47 AM fixMetabolite time: 0.0008 seconds
+08/22/2023 05:40:04 AM __init__ time: 0.0585 seconds
+08/22/2023 05:40:04 AM fixMetabolite time: 0.0008 seconds
+08/22/2023 05:40:04 AM fixMetabolite time: 0.0006 seconds
+08/22/2023 05:40:05 AM simulate time: 0.6311 seconds
+08/22/2023 05:40:05 AM The solver successfully reached the end of the integration interval.
+08/22/2023 05:41:02 AM __init__ time: 0.0587 seconds
+08/22/2023 05:41:02 AM fixMetabolite time: 0.0008 seconds
+08/22/2023 05:41:02 AM fixMetabolite time: 0.0006 seconds
+08/22/2023 05:41:03 AM simulate time: 0.7105 seconds
+08/22/2023 05:41:03 AM The solver successfully reached the end of the integration interval.
+08/22/2023 05:41:13 AM __init__ time: 0.0588 seconds
+08/22/2023 05:41:13 AM fixMetabolite time: 0.0009 seconds
+08/22/2023 05:41:13 AM fixMetabolite time: 0.0008 seconds
+08/22/2023 05:41:14 AM simulate time: 0.6956 seconds
+08/22/2023 05:41:14 AM The solver successfully reached the end of the integration interval.
+08/22/2023 05:42:24 AM __init__ time: 0.0586 seconds
+08/22/2023 05:42:24 AM fixMetabolite time: 0.0008 seconds
+08/22/2023 05:42:24 AM fixMetabolite time: 0.0006 seconds
+08/22/2023 05:42:24 AM simulate time: 0.2143 seconds
+08/22/2023 05:42:24 AM The solver successfully reached the end of the integration interval.
+08/22/2023 05:42:51 AM __init__ time: 0.0589 seconds
+08/22/2023 05:42:51 AM fixMetabolite time: 0.0008 seconds
+08/22/2023 05:42:51 AM fixMetabolite time: 0.0006 seconds
+08/22/2023 05:42:51 AM simulate time: 0.2184 seconds
+08/22/2023 05:42:51 AM The solver successfully reached the end of the integration interval.
+08/22/2023 05:44:58 AM __init__ time: 0.0585 seconds
+08/22/2023 05:44:58 AM fixMetabolite time: 0.0008 seconds
+08/22/2023 05:44:58 AM fixMetabolite time: 0.0006 seconds
+08/22/2023 05:44:58 AM simulate time: 0.2499 seconds
+08/22/2023 05:44:58 AM The solver successfully reached the end of the integration interval.
+08/22/2023 05:45:10 AM __init__ time: 0.0588 seconds
+08/22/2023 05:45:10 AM fixMetabolite time: 0.0008 seconds
+08/22/2023 05:45:10 AM fixMetabolite time: 0.0006 seconds
+08/22/2023 05:45:10 AM simulate time: 0.2488 seconds
+08/22/2023 05:45:10 AM The solver successfully reached the end of the integration interval.
+08/22/2023 05:45:40 AM __init__ time: 0.0586 seconds
+08/22/2023 05:45:40 AM fixMetabolite time: 0.0000 seconds
+08/22/2023 05:45:40 AM fixMetabolite time: 0.0000 seconds
+08/22/2023 05:45:40 AM simulate time: 0.2382 seconds
+08/22/2023 05:45:40 AM The solver successfully reached the end of the integration interval.
+08/22/2023 05:46:04 AM __init__ time: 0.0588 seconds
+08/22/2023 05:46:04 AM fixMetabolite time: 0.0000 seconds
+08/22/2023 05:46:04 AM fixMetabolite time: 0.0000 seconds
+08/22/2023 05:46:04 AM simulate time: 0.2441 seconds
+08/22/2023 05:46:04 AM The solver successfully reached the end of the integration interval.
+08/22/2023 05:47:27 AM __init__ time: 0.0587 seconds
+08/22/2023 05:47:27 AM fixMetabolite time: 0.0000 seconds
+08/22/2023 05:47:27 AM fixMetabolite time: 0.0000 seconds
+08/22/2023 05:47:27 AM simulate time: 0.2392 seconds
+08/22/2023 05:47:27 AM The solver successfully reached the end of the integration interval.
+08/22/2023 05:47:41 AM __init__ time: 0.0586 seconds
+08/22/2023 05:47:41 AM fixMetabolite time: 0.0000 seconds
+08/22/2023 05:47:41 AM fixMetabolite time: 0.0000 seconds
+08/22/2023 05:47:41 AM simulate time: 0.2178 seconds
+08/22/2023 05:47:41 AM The solver successfully reached the end of the integration interval.
+08/22/2023 05:48:27 AM __init__ time: 0.0581 seconds
+08/22/2023 05:48:27 AM fixMetabolite time: 0.0000 seconds
+08/22/2023 05:48:27 AM fixMetabolite time: 0.0000 seconds
+08/22/2023 05:48:28 AM simulate time: 0.2622 seconds
+08/22/2023 05:48:28 AM The solver successfully reached the end of the integration interval.
+08/22/2023 05:49:13 AM __init__ time: 0.0647 seconds
+08/22/2023 05:49:13 AM fixMetabolite time: 0.0000 seconds
+08/22/2023 05:49:13 AM fixMetabolite time: 0.0000 seconds
+08/22/2023 05:49:13 AM simulate time: 0.2586 seconds
+08/22/2023 05:49:13 AM The solver successfully reached the end of the integration interval.
+08/22/2023 05:52:00 AM __init__ time: 0.0583 seconds
+08/22/2023 05:52:00 AM fixMetabolite time: 0.0000 seconds
+08/22/2023 05:52:00 AM fixMetabolite time: 0.0000 seconds
+08/22/2023 05:52:00 AM simulate time: 0.2568 seconds
+08/22/2023 05:52:00 AM The solver successfully reached the end of the integration interval.
+08/22/2023 05:54:51 AM __init__ time: 0.0582 seconds
+08/22/2023 05:54:51 AM fixMetabolite time: 0.0000 seconds
+08/22/2023 05:54:51 AM fixMetabolite time: 0.0000 seconds
+08/22/2023 05:54:52 AM simulate time: 0.2907 seconds
+08/22/2023 05:54:52 AM The solver successfully reached the end of the integration interval.
