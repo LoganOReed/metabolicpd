@@ -101,6 +101,8 @@ class LIFE_Network:
             for ele in elements:
                 metabolites.append(ele)
         new_unique_metabolites = list(dict.fromkeys(metabolites))
+        self.index_to_name = np.array(new_unique_metabolites)
+        self.name_to_index = dict(zip(metabolites, np.arange(len(metabolites))))
 
         # Use names to determine type of metabolites
         metabolite_types = []
@@ -118,6 +120,7 @@ class LIFE_Network:
                 metabolite_types.append("source")
             else:  # if we didn't find a source or sink term, then it must be an actual metabolite!
                 metabolite_types.append("actual")
+        self.metabolite_type = np.array(metabolite_types)
 
         # use previous lists to construct dictionary which will be used in DataFrame construction
         temp_dict = {
@@ -207,7 +210,6 @@ class LIFE_Network:
 
     # NOTE: I've set this up so ideally it will only be called by the "simulation" function once written
     # TODO: Write Documentation for new member variables, write example use case
-    @conditional_timer("create_S_matrix")
     def create_S_matrix(self, mass):
         """Create the 'S' matrix, representing the dynamics for the network x' = S(x) * f.
 
@@ -286,6 +288,7 @@ class LIFE_Network:
     # Allows access to step function which would make setting specific values easier
     # rough comments until I know things work
     # t_0 : start, t: end, t_eval: list of points between t_0,t that the func will evaluate at.
+    @conditional_timer("simulate")
     def simulate(self, rtol=1e-4, atol=1e-5):
         """Runs the simulation."""
         sol = scp.solve_ivp(
@@ -381,8 +384,6 @@ def print_timer_stats():
 
 
 if __name__ == "__main__":
-    # network = LIFE_Network("data/simple_pd_network.xlsx", mass=None, flux=flux)
-
     # TODO: make a list of a couple interesting argument values for test cases
     # TODO: design dataframe for outputting simulation results
     # TODO: Write function that saves resultant data to file
@@ -398,11 +399,6 @@ if __name__ == "__main__":
         t_0=0,
         t=15,
     )
-
-    # To fix clearance_0 at 0.0 for whole runtime
-    # the masses need to be in the order of indices not the order of metabolite names
-    # network.fixMetabolites(["gba_0", "clearance_0"], [0.0, 2.5])
-    # To match old simulation example
 
     # setting trajectory using ndarray
     network.fixMetabolite("gba_0", 2.5, -np.sin(network.t_eval), isDerivative=True)
@@ -422,12 +418,5 @@ if __name__ == "__main__":
     # takes in xlsx, (optional) initial mass/flux, (optional) simulation time
     # gives result of simulation, interfaces for plotting/saving/analysing
 
-    # It makes sense to have another class specifically as an interface for plotting
-
-    # So at the very least I should have one more class for reading in xlsx and cleaning the data
-    # This shows every metabolite
-    # sns.lineplot(data=respr)
-    # plt.show()
-
-    # print(network.df.to_markdown())
+    print(network.df.to_markdown())
     basic_graph(result)

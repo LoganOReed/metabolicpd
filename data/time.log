@@ -39172,3 +39172,34 @@
 08/22/2023 03:22:53 AM create_S_matrix time: 0.0005 seconds
 08/22/2023 03:22:53 AM create_S_matrix time: 0.0005 seconds
 08/22/2023 03:22:53 AM The solver successfully reached the end of the integration interval.
+08/22/2023 03:26:41 AM __init__ time: 0.0681 seconds
+08/22/2023 03:26:41 AM fixMetabolite time: 0.0008 seconds
+08/22/2023 03:26:41 AM fixMetabolite time: 0.0008 seconds
+08/22/2023 03:26:42 AM simulate time: 0.3046 seconds
+08/22/2023 03:26:42 AM The solver successfully reached the end of the integration interval.
+08/22/2023 03:33:28 AM __init__ time: 0.0694 seconds
+08/22/2023 03:33:28 AM fixMetabolite time: 0.0010 seconds
+08/22/2023 03:33:28 AM fixMetabolite time: 0.0008 seconds
+08/22/2023 03:33:28 AM simulate time: 0.2746 seconds
+08/22/2023 03:33:28 AM The solver successfully reached the end of the integration interval.
+08/22/2023 03:33:42 AM __init__ time: 0.0690 seconds
+08/22/2023 03:33:42 AM fixMetabolite time: 0.0009 seconds
+08/22/2023 03:33:42 AM fixMetabolite time: 0.0008 seconds
+08/22/2023 03:33:43 AM simulate time: 0.3071 seconds
+08/22/2023 03:33:43 AM The solver successfully reached the end of the integration interval.
+08/22/2023 03:37:26 AM __init__ time: 0.0607 seconds
+08/22/2023 03:37:35 AM __init__ time: 0.0740 seconds
+08/22/2023 03:37:35 AM fixMetabolite time: 0.0011 seconds
+08/22/2023 03:37:35 AM fixMetabolite time: 0.0008 seconds
+08/22/2023 03:37:35 AM simulate time: 0.3149 seconds
+08/22/2023 03:37:35 AM The solver successfully reached the end of the integration interval.
+08/22/2023 03:40:39 AM __init__ time: 0.0701 seconds
+08/22/2023 03:40:39 AM fixMetabolite time: 0.0009 seconds
+08/22/2023 03:40:39 AM fixMetabolite time: 0.0008 seconds
+08/22/2023 03:40:39 AM simulate time: 0.2485 seconds
+08/22/2023 03:40:39 AM The solver successfully reached the end of the integration interval.
+08/22/2023 03:44:35 AM __init__ time: 0.0692 seconds
+08/22/2023 03:44:35 AM fixMetabolite time: 0.0008 seconds
+08/22/2023 03:44:35 AM fixMetabolite time: 0.0007 seconds
+08/22/2023 03:44:35 AM simulate time: 0.2956 seconds
+08/22/2023 03:44:35 AM The solver successfully reached the end of the integration interval.
