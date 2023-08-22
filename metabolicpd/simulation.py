@@ -35,7 +35,6 @@ logger.addHandler(fh)
 
 # def of conditional decorator
 # Note: Right now changing logger level between info and warning toggles printing to console
-# TODO: Make switching logging styles easier
 def conditional_timer(timer_name, to_stream=log_to_stream, condition=is_logging):
     def decorator(func):
         if not condition:
@@ -55,16 +54,21 @@ def conditional_timer(timer_name, to_stream=log_to_stream, condition=is_logging)
     return decorator
 
 
-# TODO: Fix docstrings, totally out of date
 # TODO: Create option to save numpy array to avoid initializing same data over and over
 class LIFE_Network:
     """Implements the pipeline outlined in the associated paper.
 
     Attributes:
         network (DataFrame): Stores the graph/network for the system.
-        df (DataFrame): Stores an indexed list of metabolites and their properties
+        mtb (ndarray): A Structured numpy array which stores name, type, fixed, and index values for meetabolites
         mass (ndarray): Current masses for metabolites, indices matching `df`'s indices
         flux (ndarray): Current fluxes for the network, indices matching `df`'s indices
+        ffunc (function): A differentiable, strictly increasing function used in flux computations.
+        min_func (function): A function which chooses the weight of edges between real metabolites
+        source_weights (ndarray): An array which contains the weights of each source node
+        t_0 (float): Initial time value for simulation
+        t (float): Final time value for simulation
+        num_samples (int): Number of sample points for simulation to return between t_0 and t.
 
     """
 
@@ -223,8 +227,21 @@ class LIFE_Network:
         Returns:
             A numpy array representing the S matrix for the current metabolite masses.
         """
-        mass_diag = np.zeros((self.num_edges, self.num_edges))
+        uber_diag = self.__uber_diagonal(mass)
+        mass_diag = self.__mass_diagonal(mass)
+        return ((uber_diag @ mass_diag) @ self.hyper_edges + self.source_edges).T
 
+    def __mass_diagonal(self, mass):
+        mass_diag = np.zeros((self.num_edges, self.num_edges))
+        # Temp import from old method for testing
+        for row in self.network[["tail", "head", "uber"]].itertuples():
+            row_index = row.Index
+            idxs = self.substrates[row_index]
+            min_sub = self.min_func(mass, idxs)
+            mass_diag[row_index, row_index] = min_sub
+        return mass_diag
+
+    def __uber_diagonal(self, mass):
         u_t = np.zeros(self.num_edges)
         u_t.fill(1.0)
         for i in range(len(self.uber_enhancers[0])):
@@ -237,16 +254,7 @@ class LIFE_Network:
                 self.uber_inhibiters[0][i]
             ] / self.ffunc(mass, self.uber_inhibiters[1][i])
 
-        uber_diag = np.diagflat(u_t)
-
-        # Temp import from old method for testing
-        for row in self.network[["tail", "head", "uber"]].itertuples():
-            row_index = row.Index
-            idxs = self.substrates[row_index]
-            min_sub = self.min_func(mass, idxs)
-            mass_diag[row_index, row_index] = min_sub
-
-        return ((uber_diag @ mass_diag) @ self.hyper_edges + self.source_edges).T
+        return np.diagflat(u_t)
 
     def __s_function(self, t, x):
         fixed_idx = self.mtb[self.mtb["fixed"]]["index"]
