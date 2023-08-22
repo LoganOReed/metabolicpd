@@ -55,6 +55,8 @@ def conditional_timer(timer_name, to_stream=log_to_stream, condition=is_logging)
     return decorator
 
 
+# TODO: Fix docstrings, totally out of date
+# TODO: Create option to save numpy array to avoid initializing same data over and over
 class LIFE_Network:
     """Implements the pipeline outlined in the associated paper.
 
@@ -102,6 +104,7 @@ class LIFE_Network:
                 metabolites.append(ele)
         new_unique_metabolites = list(dict.fromkeys(metabolites))
         self.num_mtb = len(new_unique_metabolites)
+        self.num_edges = self.network.shape[0]
 
         # Use names to determine type of metabolites
         metabolite_types = []
@@ -170,11 +173,6 @@ class LIFE_Network:
         uber_mods = np.zeros((self.network.shape[0], self.num_mtb))
 
         self.substrates = []
-        self.substrates_sources = []
-        self.products = []
-        self.products_sinks = []
-        self.uber_modulators = []
-        self.uber_modulator_signs = []
         # Generate lookup tables for s matrix functions
         # TODO: Check with Chris that generating this once will not break edge cases
         # TODO: Check if columns will always be in this order
@@ -185,6 +183,8 @@ class LIFE_Network:
                 "index"
             ]
 
+            self.substrates.append(sub_str)
+
             if self.mtb[sub_str[0]]["type"] == "source":
                 self.source_edges[row_idx, prod_snk] = self.source_weights[sub_str[0]]
             elif self.mtb[prod_snk[0]]["type"] == "source":
@@ -194,58 +194,20 @@ class LIFE_Network:
                 self.hyper_edges[row_idx, sub_str] = -1
                 self.hyper_edges[row_idx, prod_snk] = 1
 
-            self.substrates.append(sub_str)
-            if len(sub_str) != 1:
-                self.substrates_sources.append()
-            elif self.mtb[sub_str[0]]["type"] == "source":
-                self.substrates_sources.append(True)
-            else:
-                self.substrates_sources.append(False)
-
-            self.products.append(prod_snk)
-            if len(prod_snk) != 1:
-                self.products_sinks.append(False)
-            elif self.mtb[prod_snk[0]]["type"] == "sink":
-                self.products_sinks.append(True)
-            else:
-                self.products_sinks.append(False)
-
-            self.uber_modulators.append(
-                self.mtb[
-                    np.isin(self.mtb["name"], [s[:-2] for s in row.uber.split(", ")])
-                ]["index"]
-            )
-
             u_m = row.uber.split(", ")
-            u_m_s = []
             for uber in u_m:
                 # there should probably be some checking that happens so we don't duplicate the code in the if statements
                 if uber[-1] == "+":  # check the last term in the entry, enhancer
-                    u_m_s.append(True)
                     uber_mods[
                         row.Index, self.mtb[self.mtb["name"] == uber[:-2]]["index"]
                     ] = 1
                 elif uber[-1] == "-":  # check the last term in the entry, enhancer
-                    u_m_s.append(False)
                     uber_mods[
                         row.Index, self.mtb[self.mtb["name"] == uber[:-2]]["index"]
                     ] = -1
-            self.uber_modulator_signs.append(np.array(u_m_s, dtype="bool"))
 
         self.uber_enhancers = np.nonzero(uber_mods == 1)
         self.uber_inhibiters = np.nonzero(uber_mods == -1)
-        # print(pd.DataFrame(self.hyper_edges))
-        # print(pd.DataFrame(self.source_edges))
-        # print("THISIDSJFDFJLDJSF")
-        # print(pd.DataFrame(uber_mods))
-        # print(self.uber_enhancers)
-        # print(self.uber_inhibiters)
-        # print(self.substrates)
-        # print(self.substrates_sources)
-        # print(self.products)
-        # print(self.products_sinks)
-        # print(self.uber_modulators)
-        # print(self.uber_modulator_signs)
 
     # NOTE: I've set this up so ideally it will only be called by the "simulation" function once written
     # TODO: Write Documentation for new member variables, write example use case
@@ -261,10 +223,9 @@ class LIFE_Network:
         Returns:
             A numpy array representing the S matrix for the current metabolite masses.
         """
-        s_matrix = []
-        mass_diag = np.zeros((28, 28))
+        mass_diag = np.zeros((self.num_edges, self.num_edges))
 
-        u_t = np.zeros(28)
+        u_t = np.zeros(self.num_edges)
         u_t.fill(1.0)
         for i in range(len(self.uber_enhancers[0])):
             u_t[self.uber_enhancers[0][i]] = u_t[
@@ -285,69 +246,12 @@ class LIFE_Network:
             min_sub = self.min_func(mass, idxs)
             mass_diag[row_index, row_index] = min_sub
 
-        # OLD BELOW
-        # TODO: Check if columns will always be in this order
-        for row in self.network[["tail", "head", "uber"]].itertuples():
-            # iterate through each of the edges
-            # there could be more than one substrate
-            # or product! (for instance, in a hyperedge)
-
-            row_index = row.Index
-            col = np.zeros(self.num_mtb)
-
-            # build the uber term for each expression, default if no uber edges is 1
-            uber_term = 1.0
-            for i in range(len(self.uber_modulator_signs[row_index])):
-                # there should probably be some checking that happens so we don't duplicate the code in the if statements
-                if self.uber_modulator_signs[row_index][
-                    i
-                ]:  # check the last term in the entry, enhancer
-                    uber_term = uber_term * self.ffunc(
-                        mass, self.uber_modulators[row_index][i]
-                    )
-                elif not self.uber_modulator_signs[row_index][
-                    i
-                ]:  # check the last term in the entry, enhancer
-                    # note uber_term will always be less than one
-                    uber_term = uber_term / self.ffunc(
-                        mass, self.uber_modulators[row_index][i]
-                    )
-
-            # Note that I'm vectorizing as much as possible as the actual dataframe will be massive.
-            # Also note that I pulled as much as possible out of the function as its called every time simulate() iterates
-            idxs = self.substrates[row_index]
-            idxp = self.products[row_index]
-            min_sub = self.min_func(mass, idxs)
-            # Case: Hyperedge
-            if len(idxs) > 1 or len(idxp) > 1:
-                # This chunk of code finds min, and sets col values for both substrates and products appropriately
-                col[idxs] = -1 * min_sub * uber_term
-                col[idxp] = min_sub * uber_term
-                # mass_diag[row_index, row_index] = min_sub
-            # Case: Not Hyperedge
-            else:
-                if self.substrates_sources[row_index]:
-                    # NOTE: Implementation assumes source edges are simple diredges,
-                    #       since networks can always be converted to this form
-                    col[idxp] = self.source_weights[idxp]
-                elif self.products_sinks[row_index]:
-                    col[idxs] = -1 * mass[idxs] * uber_term
-                else:
-                    col[idxs] = -1 * mass[idxs] * uber_term
-                    col[idxp] = mass[idxs] * uber_term
-                # mass_diag[row_index, row_index] = mass[idxs[0]]
-            s_matrix.append(col)
-            mass_diag[row_index, row_index] = min_sub
-        # print("MATRIX VERSION")
-        # print(pd.DataFrame((uber_diag@mass_diag)@self.hyper_edges + self.source_edges))
-        # print("OLD VERSION")
-        # print(pd.DataFrame(np.array(s_matrix)))
-        # return np.array(s_matrix).T
         return ((uber_diag @ mass_diag) @ self.hyper_edges + self.source_edges).T
 
     def __s_function(self, t, x):
         fixed_idx = self.mtb[self.mtb["fixed"]]["index"]
-        der = np.matmul(self.create_S_matrix(x), self.flux)
+        # der = np.matmul(self.create_S_matrix(x), self.flux)
+        der = self.create_S_matrix(x) @ self.flux
         # set to zero bevause its the der and we want it constant
         for i in fixed_idx:
             der[i] = self.fixed_trajectories[i](t)
@@ -370,19 +274,13 @@ class LIFE_Network:
         )
         return sol
 
-    # I'm so sorry for writing this horrible code
-    # NOTE: I Attempted to write an equivalent function when given a position function
-    # but it ran for more than a minute and a half without any results.
     @conditional_timer("fixMetabolite")
     def fixMetabolite(self, mtb, val, trajectory=None, isDerivative=False):
         """Sets fixed flag to true and mass value to init val, and gives a derivative function for the trajectory."""
-        # TEMP
-        # self.df.loc[self.df["name"].isin([mtb]), ["fixed"]] = True
         # Need to be careful to have a scalar index instead of an array to view data instead of copy
         idx = self.mtb[self.mtb["name"] == mtb]["index"][0]
         f_mtb = self.mtb[idx]
         f_mtb["fixed"] = True
-        # idx = self.df[self.df["name"].isin([mtb])].index.to_numpy()
 
         self.mass[idx] = val
         if trajectory is None:
@@ -468,6 +366,7 @@ if __name__ == "__main__":
         source_weights=None,
         t_0=0,
         t=15,
+        num_samples=500,
     )
 
     # setting trajectory using ndarray
