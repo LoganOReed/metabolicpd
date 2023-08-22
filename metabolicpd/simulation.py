@@ -75,7 +75,18 @@ class LIFE_Network:
         ffunc=None,
         min_func=None,
         source_weights=None,
+        t_0=0,
+        t=10,
+        num_samples=50,
     ):
+        # setup simulation evaulation points
+        self.t_0 = t_0
+        self.t = t
+        self.num_samples = num_samples
+        self.t_eval, self.step_size = np.linspace(
+            self.t_0, self.t, self.num_samples, retstep=True
+        )
+
         # read graph/network from clean file
         if file is None:
             raise ValueError("A file path must be given.")
@@ -275,13 +286,13 @@ class LIFE_Network:
     # Allows access to step function which would make setting specific values easier
     # rough comments until I know things work
     # t_0 : start, t: end, t_eval: list of points between t_0,t that the func will evaluate at.
-    def simulate(self, t_0, t, t_eval=None, rtol=1e-4, atol=1e-5):
+    def simulate(self, rtol=1e-4, atol=1e-5):
         """Runs the simulation."""
         sol = scp.solve_ivp(
             self.__s_function,
-            (t_0, t),
+            (self.t_0, self.t),
             self.mass,
-            t_eval=t_eval,
+            t_eval=self.t_eval,
             rtol=rtol,
             atol=atol,
         )
@@ -290,12 +301,29 @@ class LIFE_Network:
     # I'm so sorry for writing this horrible code
     # NOTE: I Attempted to write an equivalent function when given a position function
     # but it ran for more than a minute and a half without any results.
-    def fixMetabolite(self, mtb, val, der=lambda x: 0):
+    @conditional_timer("fixMetabolite")
+    def fixMetabolite(self, mtb, val, trajectory=None, isDerivative=False):
         """Sets fixed flag to true and mass value to init val, and gives a derivative function for the trajectory."""
         self.df.loc[self.df["name"].isin([mtb]), ["fixed"]] = True
         idx = self.df[self.df["name"].isin([mtb])].index.to_numpy()
         self.mass[idx[0]] = val
-        self.fixed_trajectories[idx[0]] = der
+        if trajectory is None:
+            trajectory = self.t_eval.copy()
+            if isDerivative:
+                trajectory = trajectory.fill(0.0)
+            else:
+                trajectory = trajectory.fill(val)
+        else:
+            # convert function to ndarray if needed
+            if type(trajectory) is not np.ndarray:
+                trajectory = trajectory(self.t_eval)
+
+        if not isDerivative:
+            trajectory = np.diff(trajectory) / self.step_size
+
+        self.fixed_trajectories[idx[0]] = lambda t: trajectory[
+            int(min(np.floor(t / self.step_size), self.num_samples - 2))
+        ]
 
     def setInitialValue(self, mtb, val):
         """Sets mass value to vals."""
@@ -354,10 +382,12 @@ def print_timer_stats():
 
 if __name__ == "__main__":
     # network = LIFE_Network("data/simple_pd_network.xlsx", mass=None, flux=flux)
+
     # TODO: make a list of a couple interesting argument values for test cases
     # TODO: design dataframe for outputting simulation results
     # TODO: Write function that saves resultant data to file
     # TODO: Rewrite create_S_matrix to vectorize the row operations
+
     network = LIFE_Network(
         file="data/simple_pd_network.xlsx",
         mass=None,  # Makes the masses random via constructor
@@ -365,6 +395,8 @@ if __name__ == "__main__":
         ffunc=lambda mass, idx: np.exp(mass[idx] / (mass[idx] + 1)),
         min_func=lambda mass, idxs: np.min(mass[idxs]),
         source_weights=None,
+        t_0=0,
+        t=15,
     )
 
     # To fix clearance_0 at 0.0 for whole runtime
@@ -372,16 +404,14 @@ if __name__ == "__main__":
     # network.fixMetabolites(["gba_0", "clearance_0"], [0.0, 2.5])
     # To match old simulation example
 
-    network.fixMetabolite("gba_0", 2.5, lambda x: -np.sin(x))
-    # Old way
-    # network.fixMetabolites(["gba_0"], [2.5])
-    network.setInitialValue(["clearance_0"], [0.0])
-    # TODO: Write code to output run time for simulation
-    # cProfile.run('network.simulate(0, 12)')
+    # setting trajectory using ndarray
+    network.fixMetabolite("gba_0", 2.5, -np.sin(network.t_eval), isDerivative=True)
+    # setting trajectory using ufunc
+    network.fixMetabolite("a_syn_0", 1.5, np.cos)
+    # Set initial value without fixing metabolite
+    network.setInitialValue("clearance_0", 0.0)
 
-    t_0 = 0
-    t = 15
-    result = network.simulate(t_0, t, np.linspace(t_0, t))
+    result = network.simulate()
     logger.warning(result.message)
 
     # Create and print results to file
