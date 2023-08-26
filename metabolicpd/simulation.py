@@ -12,7 +12,7 @@ import scipy.integrate as scp
 import seaborn as sns
 
 is_logging = True
-log_to_stream = False
+log_to_stream = True
 
 # Setup for always logging to file and logging to stream when level at warning
 logger = logging.getLogger("simulation")
@@ -111,6 +111,27 @@ class LIFE_Network:
         self.num_mtb = len(new_unique_metabolites)
         self.num_edges = self.network.shape[0]
 
+        if mass is None:
+            np.random.default_rng()
+            self.mass = np.random.rand(self.num_mtb)
+        else:
+            self.mass = mass
+
+        if flux is None:
+            self.flux = np.ones(self.network.shape[0])
+        else:
+            self.flux = flux
+
+        if ffunc is None:
+            self.ffunc = lambda mass, idx: np.exp(mass[idx] / (mass[idx] + 1))
+        else:
+            self.ffunc = ffunc
+
+        if min_func is None:
+            self.min_func = lambda mass, idxs: np.min(mass[idxs])
+        else:
+            self.min_func = min_func
+
         # Use names to determine type of metabolites
         metabolite_types = []
         for ele in new_unique_metabolites:
@@ -139,27 +160,6 @@ class LIFE_Network:
         self.mtb["type"] = metabolite_types
         self.mtb["fixed"] = False
         self.mtb["index"] = np.arange(len(new_unique_metabolites))
-
-        if mass is None:
-            np.random.default_rng()
-            self.mass = np.random.rand(self.num_mtb)
-        else:
-            self.mass = mass
-
-        if flux is None:
-            self.flux = np.ones(self.network.shape[0])
-        else:
-            self.flux = flux
-
-        if ffunc is None:
-            self.ffunc = lambda mass, idx: np.exp(mass[idx] / (mass[idx] + 1))
-        else:
-            self.ffunc = ffunc
-
-        if min_func is None:
-            self.min_func = lambda mass, idxs: np.min(mass[idxs])
-        else:
-            self.min_func = min_func
 
         # TODO: Come up with input that is easier for user
         if source_weights is None:
@@ -271,7 +271,7 @@ class LIFE_Network:
     # rough comments until I know things work
     # t_0 : start, t: end, t_eval: list of points between t_0,t that the func will evaluate at.
     @conditional_timer("simulate")
-    def simulate(self, rtol=1e-4, atol=1e-5):
+    def simulate(self, events=None, rtol=1e-4, atol=1e-5, min_step=0.1):
         """Runs the simulation."""
         sol = scp.solve_ivp(
             self.__s_function,
@@ -283,10 +283,41 @@ class LIFE_Network:
         )
         return sol
 
+    @conditional_timer("simulate_pos")
+    def simulate_prototype_pos_def(self, events=None, rtol=1e-4, atol=1e-5, min_step=0.1):
+        """Runs the simulation."""
+        ts = []
+        xs = []
+        should_continue = True
+        while should_continue:
+            sol = scp.solve_ivp(
+                self.__s_function,
+                (self.t_0, self.t),
+                self.mass,
+                # t_eval=np.compress(self.t_eval > self.t_0, self.t_eval),
+                events=events,
+                rtol=rtol,
+                atol=atol,
+            )
+            ts.append(sol.t)
+            xs.append(sol.y)
+            if sol.status == 1:
+                self.t_0 = sol.t[-1]
+                # Reset initial state
+                self.mass = sol.y[:, -1].copy()
+                self.mass = np.clip(self.mass, 0.01, None)
+            else:
+                should_continue = False
+        tt = np.concatenate(ts)
+        yy = np.concatenate(xs, axis=1)
+        res = {"t": tt, "y": yy}
+        return res
+
     @conditional_timer("fixMetabolite")
     def fixMetabolite(self, mtb, val, trajectory=None, isDerivative=False):
         """Sets fixed flag to true and mass value to init val, and gives a derivative function for the trajectory."""
         # Need to be careful to have a scalar index instead of an array to view data instead of copy
+        # TODO: Make exception for out of bounds error
         idx = self.mtb[self.mtb["name"] == mtb]["index"][0]
         f_mtb = self.mtb[idx]
         f_mtb["fixed"] = True
@@ -316,29 +347,21 @@ class LIFE_Network:
 
 
 # TODO: Generalize this and give docstring
-def basic_graph(result):
+def basic_graph(result, network, mtb_to_plot, ylim=[0, 3]):
     sns.set_theme()
     sns.set_style("dark")
     sns.color_palette("pastel")
     sns.set_context("talk")
     # sns.despine(offset=10, trim=True)
-    metas_to_plot = [
-        "a_syn_0",
-        "a_syn_1",
-        "a_syn_proto_0",
-        "clearance_0",
-        "gba_0",
-        "glucosylceramide_0",
-        "mis_a_syn_0",
-        "mis_a_syn_1",
-        "mutant_lrrk2_0",
-    ]
-    metabolites_to_plot = [0, 1, 3, 6, 17, 22, 23, 25]
+
+    metabolites_to_plot = mtb_to_plot
+    mtb_names = network.mtb[metabolites_to_plot]["name"]
     label_idx = 0
     for i in metabolites_to_plot:
-        plt.plot(result.t, result.y[i], label=metas_to_plot[label_idx])
+        # plt.plot(result.t, result.y[i], label=mtb_names[label_idx])
+        plt.plot(result["t"], result["y"][i], label=mtb_names[label_idx])
         label_idx = label_idx + 1
-    plt.ylim([0, 3])
+    plt.ylim(ylim)
     plt.xlabel("$t$")  # the horizontal axis represents the time
     plt.legend()  # show how the colors correspond to the components of X
     sns.despine(offset=10, trim=True)
@@ -358,6 +381,28 @@ def print_timer_stats():
     )
 
 
+# TODO: Write with numpy so it doesn't take forever
+@conditional_timer("Hill")
+def hill(x, p=1, k=1.0):
+    """x: positive mass of tail node, p: power (int), k some 'dissociation' constant"""
+    x_p = pow(x, p)
+    return x_p / (k + x_p)
+
+
+def min_min(mass, idx):
+    if np.less_equal(mass[idx], 6):
+        return np.divide(3, np.add(np.power(mass[idx] - 6, 2), 5))[0]
+    else:
+        return np.divide(3, 5)
+
+
+def halt_event(t, x):
+    return np.min(x)
+
+
+halt_event.terminal = True
+
+
 if __name__ == "__main__":
     # Setup different plt backend for kitty term
     if platform.system() == "Linux":
@@ -370,6 +415,23 @@ if __name__ == "__main__":
 
     pd.set_option("display.precision", 2)
 
+    min_network = LIFE_Network(
+        file="data/minimal_example.xlsx",
+        mass=np.array([9, 9, 9]),  # Makes the masses random via constructor
+        flux=np.array([1, 3, 3, 2]),
+        ffunc=lambda mass, idx: mass[idx],
+        min_func=min_min,
+        source_weights=None,
+        t_0=0,
+        t=15,
+        num_samples=50,
+    )
+    
+    result = min_network.simulate_prototype_pos_def(halt_event)
+    # logger.warning(result.message)
+
+    basic_graph(result, min_network, [0, 1, 2], ylim=[0, 10])
+
     network = LIFE_Network(
         file="data/simple_pd_network.xlsx",
         mass=None,  # Makes the masses random via constructor
@@ -379,7 +441,7 @@ if __name__ == "__main__":
         source_weights=None,
         t_0=0,
         t=15,
-        num_samples=500,
+        num_samples=50,
     )
 
     # setting trajectory using ndarray
@@ -402,4 +464,21 @@ if __name__ == "__main__":
     # gives result of simulation, interfaces for plotting/saving/analysing
 
     # print(network.mtb)
-    basic_graph(result)
+    basic_graph(result, network, [0, 1, 3, 6, 17, 22, 23, 25])
+
+    # Another Example Case for a network from another paper
+    cctb_network = LIFE_Network(
+        file="data/central_carbon_tb.xlsx",
+        mass=None,  # Makes the masses random via constructor
+        flux=np.random.default_rng().uniform(0.1, 0.8, 20),
+        ffunc=lambda mass, idx: np.exp(mass[idx] / (mass[idx] + 1)),
+        min_func=lambda mass, idxs: np.min(mass[idxs]),
+        source_weights=None,
+        t_0=0,
+        t=15,
+        num_samples=50,
+    )
+    result = cctb_network.simulate()
+    logger.warning(result.message)
+
+    basic_graph(result, cctb_network, [0, 1, 2, 3, 4, 5, 6, 7, 8])
