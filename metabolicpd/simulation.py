@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 import logging  # for sending timer logs to a file
+import platform
 import re
 
-import platform
 import codetiming as ct
 import matplotlib.pyplot as plt
 import numpy as np
@@ -284,7 +284,9 @@ class LIFE_Network:
         return sol
 
     @conditional_timer("simulate_pos")
-    def simulate_prototype_pos_def(self, events=None, rtol=1e-4, atol=1e-5, min_step=0.1):
+    def simulate_prototype_pos_def(
+        self, events=None, rtol=1e-4, atol=1e-5, min_step=0.1
+    ):
         """Runs the simulation."""
         ts = []
         xs = []
@@ -384,23 +386,9 @@ def print_timer_stats():
 # TODO: Write with numpy so it doesn't take forever
 @conditional_timer("Hill")
 def hill(x, p=1, k=1.0):
-    """x: positive mass of tail node, p: power (int), k some 'dissociation' constant"""
+    """x: positive mass of tail node, p: power (int), k some 'dissociation' constant."""
     x_p = pow(x, p)
     return x_p / (k + x_p)
-
-
-def min_min(mass, idx):
-    if np.less_equal(mass[idx], 6):
-        return np.divide(3, np.add(np.power(mass[idx] - 6, 2), 5))[0]
-    else:
-        return np.divide(3, 5)
-
-
-def halt_event(t, x):
-    return np.min(x)
-
-
-halt_event.terminal = True
 
 
 if __name__ == "__main__":
@@ -414,23 +402,6 @@ if __name__ == "__main__":
     # TODO: Rewrite create_S_matrix to vectorize the row operations
 
     pd.set_option("display.precision", 2)
-
-    min_network = LIFE_Network(
-        file="data/minimal_example.xlsx",
-        mass=np.array([9, 9, 9]),  # Makes the masses random via constructor
-        flux=np.array([1, 3, 3, 2]),
-        ffunc=lambda mass, idx: mass[idx],
-        min_func=min_min,
-        source_weights=None,
-        t_0=0,
-        t=15,
-        num_samples=50,
-    )
-    
-    result = min_network.simulate_prototype_pos_def(halt_event)
-    # logger.warning(result.message)
-
-    basic_graph(result, min_network, [0, 1, 2], ylim=[0, 10])
 
     network = LIFE_Network(
         file="data/simple_pd_network.xlsx",
@@ -467,18 +438,46 @@ if __name__ == "__main__":
     basic_graph(result, network, [0, 1, 3, 6, 17, 22, 23, 25])
 
     # Another Example Case for a network from another paper
-    cctb_network = LIFE_Network(
-        file="data/central_carbon_tb.xlsx",
-        mass=None,  # Makes the masses random via constructor
-        flux=np.random.default_rng().uniform(0.1, 0.8, 20),
-        ffunc=lambda mass, idx: np.exp(mass[idx] / (mass[idx] + 1)),
-        min_func=lambda mass, idxs: np.min(mass[idxs]),
-        source_weights=None,
-        t_0=0,
-        t=15,
-        num_samples=50,
-    )
-    result = cctb_network.simulate()
-    logger.warning(result.message)
+    # cctb_network = LIFE_Network(
+    #     file="data/central_carbon_tb.xlsx",
+    #     mass=None,  # Makes the masses random via constructor
+    #     flux=np.random.default_rng().uniform(0.1, 0.8, 20),
+    #     ffunc=lambda mass, idx: np.exp(mass[idx] / (mass[idx] + 1)),
+    #     min_func=lambda mass, idxs: np.min(mass[idxs]),
+    #     source_weights=None,
+    #     t_0=0,
+    #     t=15,
+    #     num_samples=50,
+    # )
+    # result = cctb_network.simulate()
+    # logger.warning(result.message)
+    #
+    # basic_graph(result, cctb_network, [0, 1, 2, 3, 4, 5, 6, 7, 8])
 
-    basic_graph(result, cctb_network, [0, 1, 2, 3, 4, 5, 6, 7, 8])
+    # def min_min(mass, idx):
+    #     if np.less_equal(mass[idx], 6):
+    #         return np.divide(3, np.add(np.power(mass[idx] - 6, 2), 5))[0]
+    #     else:
+    #         return np.divide(3, 5)
+    #
+    # def halt_event(t, x):
+    #     return np.min(x)
+    # halt_event.terminal = True
+    #
+    # min_network = LIFE_Network(
+    #     file="data/minimal_example.xlsx",
+    #     mass=np.array([9, 9, 9]),  # Makes the masses random via constructor
+    #     flux=np.array([1, 3, 3, 2]),
+    #     ffunc=lambda mass, idx: mass[idx],
+    #     min_func=min_min,
+    #     source_weights=None,
+    #     t_0=0,
+    #     t=15,
+    #     num_samples=50,
+    # )
+    #
+    # result = min_network.simulate_prototype_pos_def(halt_event)
+    # # logger.warning(result.message)
+    #
+    # basic_graph(result, min_network, [0, 1, 2], ylim=[0, 10])
+    #

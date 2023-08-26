@@ -1,0 +1,9 @@
+08/26/2023 06:42:11 PM __init__ time: 0.0423 seconds
+08/26/2023 06:42:11 PM simulate_pos time: 0.0305 seconds
+08/26/2023 06:42:11 PM __init__ time: 0.0050 seconds
+08/26/2023 06:42:11 PM fixMetabolite time: 0.0000 seconds
+08/26/2023 06:42:11 PM simulate time: 0.0496 seconds
+08/26/2023 06:42:11 PM The solver successfully reached the end of the integration interval.
+08/26/2023 06:42:12 PM __init__ time: 0.0050 seconds
+08/26/2023 06:42:12 PM simulate time: 0.0517 seconds
+08/26/2023 06:42:12 PM The solver successfully reached the end of the integration interval.
