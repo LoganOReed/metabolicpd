@@ -3,6 +3,7 @@
 import logging  # for sending timer logs to a file
 import re
 
+import platform
 import codetiming as ct
 import matplotlib.pyplot as plt
 import numpy as np
@@ -358,6 +359,10 @@ def print_timer_stats():
 
 
 if __name__ == "__main__":
+    # Setup different plt backend for kitty term
+    if platform.system() == "Linux":
+        plt.switch_backend("module://matplotlib-backend-kitty")
+
     # TODO: make a list of a couple interesting argument values for test cases
     # TODO: design dataframe for outputting simulation results
     # TODO: Write function that saves resultant data to file
