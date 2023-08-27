@@ -1,5 +1,5 @@
 # Example3: Very small metabolic graph with no virtual nodes
-# has
+# has fixed mass, flux and custom min function
 
 import numpy as np
 
@@ -13,6 +13,7 @@ if __name__ == "__main__":
         else:
             return np.divide(3, 5)
 
+    # NOTE: Not currently being used
     def halt_event(t, x):
         return np.min(x)
 
@@ -34,4 +35,4 @@ if __name__ == "__main__":
     result = min_network.simulate()
     # logger.warning(result.message)
 
-    network.basic_graph(result, min_network, [0, 1, 2], ylim=[0, 10])
+    network.basic_plot(result, min_network, [0, 1, 2], ylim=[0, 10])

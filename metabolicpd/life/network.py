@@ -11,6 +11,8 @@ import pandas as pd
 import scipy.integrate as scp
 import seaborn as sns
 
+from metabolicpd.life import util
+
 is_logging = False
 log_to_stream = True
 
@@ -124,12 +126,13 @@ class Metabolic_Graph:
             self.flux = flux
 
         if ffunc is None:
-            self.ffunc = lambda mass, idx: np.exp(mass[idx] / (mass[idx] + 1))
+            # self.ffunc = lambda mass, idx: np.exp(mass[idx] / (mass[idx] + 1))
+            self.ffunc = lambda mass, idx: util.hill(mass[idx])
         else:
             self.ffunc = ffunc
 
         if min_func is None:
-            self.min_func = lambda mass, idxs: np.min(mass[idxs])
+            self.min_func = util.min
         else:
             self.min_func = min_func
 
@@ -260,9 +263,8 @@ class Metabolic_Graph:
 
     def __s_function(self, t, x):
         fixed_idx = self.mtb[self.mtb["fixed"]]["index"]
-        # der = np.matmul(self.create_S_matrix(x), self.flux)
         der = self.create_S_matrix(x) @ self.flux
-        # set to zero bevause its the der and we want it constant
+        # replaces computed derivative with one which we control
         for i in fixed_idx:
             der[i] = self.fixed_trajectories[i](t)
         return der
@@ -289,12 +291,6 @@ class Metabolic_Graph:
 
         tt = np.array(ts)
         yy = np.stack(xs)
-        # print("XSXSXSXS")
-        # print(tt)
-        # print(tt.shape)
-        # print(yy)
-        # print(yy.shape)
-
         res = {"t": tt, "y": yy.T}
         return res
 
@@ -332,7 +328,8 @@ class Metabolic_Graph:
 
 
 # TODO: Generalize this and give docstring
-def basic_graph(result, network, mtb_to_plot, ylim=[0, 3]):
+# TODO: Maybe move into class or make plot file
+def basic_plot(result, network, mtb_to_plot, ylim=[0, 3]):
     # Setup different plt backend for kitty term
     if platform.system() == "Linux":
         plt.switch_backend("module://matplotlib-backend-kitty")
@@ -340,13 +337,11 @@ def basic_graph(result, network, mtb_to_plot, ylim=[0, 3]):
     sns.set_style("dark")
     sns.color_palette("pastel")
     sns.set_context("talk")
-    # sns.despine(offset=10, trim=True)
 
     metabolites_to_plot = mtb_to_plot
     mtb_names = network.mtb[metabolites_to_plot]["name"]
     label_idx = 0
     for i in metabolites_to_plot:
-        # plt.plot(result.t, result.y[i], label=mtb_names[label_idx])
         plt.plot(result["t"], result["y"][i], label=mtb_names[label_idx])
         label_idx = label_idx + 1
     plt.ylim(ylim)
@@ -356,31 +351,9 @@ def basic_graph(result, network, mtb_to_plot, ylim=[0, 3]):
     plt.show()
 
 
-# TODO: Fill this out for general use
-def print_timer_stats():
-    print(
-        "Count: {0}\nTotal: {1}\nMax: {2}\nMin: {3}\nStdev: {4}".format(
-            ct.Timer.timers.count("create_S_matrix"),
-            ct.Timer.timers.total("create_S_matrix"),
-            ct.Timer.timers.max("create_S_matrix"),
-            ct.Timer.timers.min("create_S_matrix"),
-            ct.Timer.timers.stdev("create_S_matrix"),
-        )
-    )
-
-
-# TODO: Write with numpy so it doesn't take forever
-@conditional_timer("Hill")
-def hill(x, p=1, k=1.0):
-    """x: positive mass of tail node, p: power (int), k some 'dissociation' constant."""
-    x_p = pow(x, p)
-    return x_p / (k + x_p)
-
-
 if __name__ == "__main__":
     print("network.py is not intended to be main, use an example or call in a script.")
 
     # TODO: make a list of a couple interesting argument values for test cases
     # TODO: design dataframe for outputting simulation results
     # TODO: Write function that saves resultant data to file
-    # TODO: Rewrite create_S_matrix to vectorize the row operations
