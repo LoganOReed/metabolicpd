@@ -56,7 +56,7 @@ def conditional_timer(timer_name, to_stream=log_to_stream, condition=is_logging)
 
 
 # TODO: Create option to save numpy array to avoid initializing same data over and over
-class LIFE_Network:
+class Metabolic_Graph:
     """Implements the pipeline outlined in the associated paper.
 
     Attributes:
@@ -419,7 +419,7 @@ if __name__ == "__main__":
 
     pd.set_option("display.precision", 2)
 
-    network = LIFE_Network(
+    network = Metabolic_Graph(
         file="data/simple_pd_network.xlsx",
         mass=None,  # Makes the masses random via constructor
         flux=np.random.default_rng().uniform(0.1, 0.8, 28),
