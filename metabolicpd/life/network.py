@@ -268,9 +268,10 @@ class Metabolic_Graph:
         return der
 
     # TODO: Look into switching to scipy.integrate.RK45 explicity
+    # TODO: Ask Chris if we need to force x being positive
+    # TODO: Docstring
     # Allows access to step function which would make setting specific values easier
     # rough comments until I know things work
-    # t_0 : start, t: end, t_eval: list of points between t_0,t that the func will evaluate at.
     @conditional_timer("simulate")
     def simulate(self, rtol=1e-4, atol=1e-5, max_step=np.inf):
         """Runs the simulation."""
@@ -281,8 +282,6 @@ class Metabolic_Graph:
         )
         # options are 'running' 'finished' or 'failed'
 
-        # for i in range(100):
-        # sol.step()
         while sol.status == "running":
             sol.step()
             ts.append(sol.t)
@@ -297,38 +296,6 @@ class Metabolic_Graph:
         # print(yy.shape)
 
         res = {"t": tt, "y": yy.T}
-        return res
-
-    @conditional_timer("simulate_pos")
-    def simulate_prototype_pos_def(
-        self, events=None, rtol=1e-4, atol=1e-5, min_step=0.1
-    ):
-        """Runs the simulation."""
-        ts = []
-        xs = []
-        should_continue = True
-        while should_continue:
-            sol = scp.solve_ivp(
-                self.__s_function,
-                (self.t_0, self.t),
-                self.mass,
-                # t_eval=np.compress(self.t_eval > self.t_0, self.t_eval),
-                events=events,
-                rtol=rtol,
-                atol=atol,
-            )
-            ts.append(sol.t)
-            xs.append(sol.y)
-            if sol.status == 1:
-                self.t_0 = sol.t[-1]
-                # Reset initial state
-                self.mass = sol.y[:, -1].copy()
-                self.mass = np.clip(self.mass, 0.01, None)
-            else:
-                should_continue = False
-        tt = np.concatenate(ts)
-        yy = np.concatenate(xs, axis=1)
-        res = {"t": tt, "y": yy}
         return res
 
     @conditional_timer("fixMetabolite")
@@ -411,41 +378,9 @@ def hill(x, p=1, k=1.0):
 
 
 if __name__ == "__main__":
-    # Setup different plt backend for kitty term
-    if platform.system() == "Linux":
-        plt.switch_backend("module://matplotlib-backend-kitty")
+    print("network.py is not intended to be main, use an example or call in a script.")
 
     # TODO: make a list of a couple interesting argument values for test cases
     # TODO: design dataframe for outputting simulation results
     # TODO: Write function that saves resultant data to file
     # TODO: Rewrite create_S_matrix to vectorize the row operations
-
-    pd.set_option("display.precision", 2)
-
-    # def min_min(mass, idx):
-    #     if np.less_equal(mass[idx], 6):
-    #         return np.divide(3, np.add(np.power(mass[idx] - 6, 2), 5))[0]
-    #     else:
-    #         return np.divide(3, 5)
-    #
-    # def halt_event(t, x):
-    #     return np.min(x)
-    # halt_event.terminal = True
-    #
-    # min_network = LIFE_Network(
-    #     file="data/minimal_example.xlsx",
-    #     mass=np.array([9, 9, 9]),  # Makes the masses random via constructor
-    #     flux=np.array([1, 3, 3, 2]),
-    #     ffunc=lambda mass, idx: mass[idx],
-    #     min_func=min_min,
-    #     source_weights=None,
-    #     t_0=0,
-    #     t=15,
-    #     num_samples=50,
-    # )
-    #
-    # result = min_network.simulate_prototype_pos_def(halt_event)
-    # # logger.warning(result.message)
-    #
-    # basic_graph(result, min_network, [0, 1, 2], ylim=[0, 10])
-    #
