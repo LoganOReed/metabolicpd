@@ -228,12 +228,12 @@ class Metabolic_Graph:
     # TODO: Docstring
     # Allows access to step function which would make setting specific values easier
     # rough comments until I know things work
-    def simulate(self, rtol=1e-4, atol=1e-5, max_step=np.inf):
+    def simulate(self):
         """Runs the simulation."""
         ts = []
         xs = []
         sol = scp.RK45(
-            self.__s_function, self.t_0, self.mass, self.t, max_step=max_step
+            self.__s_function, self.t_0, self.mass, self.t, max_step=self.step_size
         )
         # options are 'running' 'finished' or 'failed'
 
@@ -250,7 +250,6 @@ class Metabolic_Graph:
     def fixMetabolite(self, mtb, val, trajectory=None, isDerivative=False):
         """Sets fixed flag to true and mass value to init val, and gives a derivative function for the trajectory."""
         # Need to be careful to have a scalar index instead of an array to view data instead of copy
-        # TODO: Make exception for out of bounds error
         idx = self.mtb[self.mtb["name"] == mtb]["index"][0]
         f_mtb = self.mtb[idx]
         f_mtb["fixed"] = True
@@ -279,9 +278,9 @@ class Metabolic_Graph:
         self.mass[idx] = val
 
 
-# TODO: Generalize this and give docstring
 # TODO: Maybe move into class or make plot file
 def basic_plot(result, network, mtb_to_plot, ylim=[0, 3]):
+    """Creates a plot showing the metabolites `mtb_to_plot` using Metabolic_Graph data."""
     # Setup different plt backend for kitty term
     if platform.system() == "Linux":
         plt.switch_backend("module://matplotlib-backend-kitty")

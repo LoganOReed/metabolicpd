@@ -23,13 +23,5 @@ if __name__ == "__main__":
     s.fixMetabolite("a_syn_0", 1.5)
     s.setInitialValue("clearance_0", 0.0)
 
-    result = s.simulate(max_step=0.5)
-
-    # TODO: Write member function for this
-    # Create and print results to file
-    # respr = pd.DataFrame(result.y.T, columns=network.mtb["name"])
-    # respr.insert(0, "time", result.t)
-    # respr.to_csv("data/results.csv")
-
-    # TODO: Find a better home for this
+    result = s.simulate()
     network.basic_plot(result, s, [0, 1, 3, 6, 17, 22, 23, 25])
