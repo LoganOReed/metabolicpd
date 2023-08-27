@@ -11,7 +11,7 @@ import pandas as pd
 import scipy.integrate as scp
 import seaborn as sns
 
-is_logging = True
+is_logging = False
 log_to_stream = True
 
 # Setup for always logging to file and logging to stream when level at warning
@@ -366,6 +366,9 @@ class Metabolic_Graph:
 
 # TODO: Generalize this and give docstring
 def basic_graph(result, network, mtb_to_plot, ylim=[0, 3]):
+    # Setup different plt backend for kitty term
+    if platform.system() == "Linux":
+        plt.switch_backend("module://matplotlib-backend-kitty")
     sns.set_theme()
     sns.set_style("dark")
     sns.color_palette("pastel")
@@ -418,57 +421,6 @@ if __name__ == "__main__":
     # TODO: Rewrite create_S_matrix to vectorize the row operations
 
     pd.set_option("display.precision", 2)
-
-    network = Metabolic_Graph(
-        file="data/simple_pd_network.xlsx",
-        mass=None,  # Makes the masses random via constructor
-        flux=np.random.default_rng().uniform(0.1, 0.8, 28),
-        ffunc=lambda mass, idx: np.exp(mass[idx] / (mass[idx] + 1)),
-        min_func=lambda mass, idxs: np.min(mass[idxs]),
-        source_weights=None,
-        t_0=0,
-        t=15,
-        num_samples=50,
-    )
-
-    # setting trajectory using ndarray
-    # network.fixMetabolite("gba_0", 2.5, -np.sin(network.t_eval), isDerivative=True)
-    network.fixMetabolite("gba_0", 2.5)
-    # setting trajectory using ufunc
-    # network.fixMetabolite("a_syn_0", 1.5)
-    # Set initial value without fixing metabolite
-    network.setInitialValue("clearance_0", 0.0)
-
-    # result = network.simulate(max_step=0.5)
-    result = network.simulate(max_step=0.5)
-
-    # Create and print results to file
-    # respr = pd.DataFrame(result.y.T, columns=network.mtb["name"])
-    # respr.insert(0, "time", result.t)
-    # respr.to_csv("data/results.csv")
-
-    # takes in xlsx, (optional) initial mass/flux, (optional) simulation time
-    # gives result of simulation, interfaces for plotting/saving/analysing
-
-    # print(network.mtb)
-    basic_graph(result, network, [0, 1, 3, 6, 17, 22, 23, 25])
-
-    # Another Example Case for a network from another paper
-    # cctb_network = LIFE_Network(
-    #     file="data/central_carbon_tb.xlsx",
-    #     mass=None,  # Makes the masses random via constructor
-    #     flux=np.random.default_rng().uniform(0.1, 0.8, 20),
-    #     ffunc=lambda mass, idx: np.exp(mass[idx] / (mass[idx] + 1)),
-    #     min_func=lambda mass, idxs: np.min(mass[idxs]),
-    #     source_weights=None,
-    #     t_0=0,
-    #     t=15,
-    #     num_samples=50,
-    # )
-    # result = cctb_network.simulate()
-    # logger.warning(result.message)
-    #
-    # basic_graph(result, cctb_network, [0, 1, 2, 3, 4, 5, 6, 7, 8])
 
     # def min_min(mass, idx):
     #     if np.less_equal(mass[idx], 6):
