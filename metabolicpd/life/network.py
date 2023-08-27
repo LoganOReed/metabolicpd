@@ -14,6 +14,7 @@ from metabolicpd.life import util
 
 # TODO: Create option to save numpy array to avoid initializing same data over and over
 # TODO: Look into designing better data file format to read in from and add conversion to "io"
+# TODO: Look into using GraphML as storage
 class Metabolic_Graph:
     """Implements the pipeline outlined in the associated paper.
 
