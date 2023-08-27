@@ -49,19 +49,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#metabolicpd-example-docs-module">metabolicpd.example_docs module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#metabolicpd-import-matrix-module">metabolicpd.import_matrix module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#metabolicpd-ptr-class-module">metabolicpd.ptr_class module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-metabolicpd.read_and_plot">metabolicpd.read_and_plot module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#metabolicpd.read_and_plot.Data_Reader"><code class="docutils literal notranslate"><span class="pre">Data_Reader</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#metabolicpd.read_and_plot.Data_Reader.compute_deriv_values"><code class="docutils literal notranslate"><span class="pre">Data_Reader.compute_deriv_values()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#metabolicpd.read_and_plot.Data_Reader.overlapping_plot_results_of_interest"><code class="docutils literal notranslate"><span class="pre">Data_Reader.overlapping_plot_results_of_interest()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#metabolicpd.read_and_plot.Data_Reader.plot_results_of_interest"><code class="docutils literal notranslate"><span class="pre">Data_Reader.plot_results_of_interest()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#metabolicpd.read_and_plot.Data_Reader.set_metabolites_to_plot"><code class="docutils literal notranslate"><span class="pre">Data_Reader.set_metabolites_to_plot()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#metabolicpd.read_and_plot.Data_Reader.update_clearance_values"><code class="docutils literal notranslate"><span class="pre">Data_Reader.update_clearance_values()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#metabolicpd.read_and_plot.determine_different_trajectories"><code class="docutils literal notranslate"><span class="pre">determine_different_trajectories()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#metabolicpd.read_and_plot.plot_difference"><code class="docutils literal notranslate"><span class="pre">plot_difference()</span></code></a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="#metabolicpd-read-and-plot-module">metabolicpd.read_and_plot module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#metabolicpd-simulator-module">metabolicpd.simulator module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#metabolicpd-symbolic-approach-module">metabolicpd.symbolic_approach module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-metabolicpd">Module contents</a></li>
@@ -107,83 +95,8 @@
 <section id="metabolicpd-ptr-class-module">
 <h2>metabolicpd.ptr_class module<a class="headerlink" href="#metabolicpd-ptr-class-module" title="Permalink to this heading"></a></h2>
 </section>
-<section id="module-metabolicpd.read_and_plot">
-<span id="metabolicpd-read-and-plot-module"></span><h2>metabolicpd.read_and_plot module<a class="headerlink" href="#module-metabolicpd.read_and_plot" title="Permalink to this heading"></a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="metabolicpd.read_and_plot.Data_Reader">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">metabolicpd.read_and_plot.</span></span><span class="sig-name descname"><span class="pre">Data_Reader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#metabolicpd.read_and_plot.Data_Reader" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="py method">
-<dt class="sig sig-object py" id="metabolicpd.read_and_plot.Data_Reader.compute_deriv_values">
-<span class="sig-name descname"><span class="pre">compute_deriv_values</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#metabolicpd.read_and_plot.Data_Reader.compute_deriv_values" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="metabolicpd.read_and_plot.Data_Reader.overlapping_plot_results_of_interest">
-<span class="sig-name descname"><span class="pre">overlapping_plot_results_of_interest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">existing_ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_modifier</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linestyle</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#metabolicpd.read_and_plot.Data_Reader.overlapping_plot_results_of_interest" title="Permalink to this definition"></a></dt>
-<dd><p>Plots the results of the simulation for a subset of metabolites.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>t</strong> – a list of timepoints</p></li>
-<li><p><strong>values</strong> – a list of metabolite levels during simulation (parallel with t)</p></li>
-<li><p><strong>meta_of_interest</strong> – a list of metabolite names to plot</p></li>
-<li><p><strong>actual_lookup</strong> – a python dictionary where keys are metabolites, values are indices of metabolites</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>displays a matplotlib.pyplot plot</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="metabolicpd.read_and_plot.Data_Reader.plot_results_of_interest">
-<span class="sig-name descname"><span class="pre">plot_results_of_interest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label_modifier</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#metabolicpd.read_and_plot.Data_Reader.plot_results_of_interest" title="Permalink to this definition"></a></dt>
-<dd><p>Plots the results of the simulation for a subset of metabolites.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>t</strong> – a list of timepoints</p></li>
-<li><p><strong>values</strong> – a list of metabolite levels during simulation (parallel with t)</p></li>
-<li><p><strong>meta_of_interest</strong> – a list of metabolite names to plot</p></li>
-<li><p><strong>actual_lookup</strong> – a python dictionary where keys are metabolites, values are indices of metabolites</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>displays a matplotlib.pyplot plot</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="metabolicpd.read_and_plot.Data_Reader.set_metabolites_to_plot">
-<span class="sig-name descname"><span class="pre">set_metabolites_to_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list_of_metabolites</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#metabolicpd.read_and_plot.Data_Reader.set_metabolites_to_plot" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="metabolicpd.read_and_plot.Data_Reader.update_clearance_values">
-<span class="sig-name descname"><span class="pre">update_clearance_values</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#metabolicpd.read_and_plot.Data_Reader.update_clearance_values" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="metabolicpd.read_and_plot.determine_different_trajectories">
-<span class="sig-prename descclassname"><span class="pre">metabolicpd.read_and_plot.</span></span><span class="sig-name descname"><span class="pre">determine_different_trajectories</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dr_low</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dr_high</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#metabolicpd.read_and_plot.determine_different_trajectories" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="metabolicpd.read_and_plot.plot_difference">
-<span class="sig-prename descclassname"><span class="pre">metabolicpd.read_and_plot.</span></span><span class="sig-name descname"><span class="pre">plot_difference</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dr_healthy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dr_disease</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#metabolicpd.read_and_plot.plot_difference" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
+<section id="metabolicpd-read-and-plot-module">
+<h2>metabolicpd.read_and_plot module<a class="headerlink" href="#metabolicpd-read-and-plot-module" title="Permalink to this heading"></a></h2>
 </section>
 <section id="metabolicpd-simulator-module">
 <h2>metabolicpd.simulator module<a class="headerlink" href="#metabolicpd-simulator-module" title="Permalink to this heading"></a></h2>
