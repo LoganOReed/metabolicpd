@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 
-import logging  # for sending timer logs to a file
 import platform
 import re
 
-import codetiming as ct
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -12,49 +10,6 @@ import scipy.integrate as scp
 import seaborn as sns
 
 from metabolicpd.life import util
-
-is_logging = False
-log_to_stream = True
-
-# Setup for always logging to file and logging to stream when level at warning
-logger = logging.getLogger("simulation")
-logger.setLevel(logging.DEBUG)
-# create file handler which logs even debug messages
-fh = logging.FileHandler("data/time.log")
-fh.setLevel(logging.INFO)
-# create console handler with a higher log level
-ch = logging.StreamHandler()
-ch.setLevel(logging.WARNING)
-# create formatter and add it to the handlers
-formatter = logging.Formatter(
-    fmt="%(asctime)s %(message)s", datefmt="%m/%d/%Y %I:%M:%S %p"
-)
-ch.setFormatter(formatter)
-fh.setFormatter(formatter)
-# add the handlers to logger
-logger.addHandler(ch)
-logger.addHandler(fh)
-
-
-# def of conditional decorator
-# Note: Right now changing logger level between info and warning toggles printing to console
-def conditional_timer(timer_name, to_stream=log_to_stream, condition=is_logging):
-    def decorator(func):
-        if not condition:
-            # Return the function unchanged, not decorated.
-            return func
-        if to_stream:
-            return ct.Timer(
-                name=timer_name,
-                text="{name} time: {:.4f} seconds",
-                logger=logger.warning,
-            )(func)
-        else:
-            return ct.Timer(
-                name=timer_name, text="{name} time: {:.4f} seconds", logger=logger.info
-            )(func)
-
-    return decorator
 
 
 # TODO: Create option to save numpy array to avoid initializing same data over and over
@@ -76,7 +31,6 @@ class Metabolic_Graph:
     """
 
     # TODO: Create local variable that uses t's and num_samples to get max step size for simulation
-    @conditional_timer("__init__")
     def __init__(
         self,
         file=None,
@@ -274,7 +228,6 @@ class Metabolic_Graph:
     # TODO: Docstring
     # Allows access to step function which would make setting specific values easier
     # rough comments until I know things work
-    @conditional_timer("simulate")
     def simulate(self, rtol=1e-4, atol=1e-5, max_step=np.inf):
         """Runs the simulation."""
         ts = []
@@ -294,7 +247,6 @@ class Metabolic_Graph:
         res = {"t": tt, "y": yy.T}
         return res
 
-    @conditional_timer("fixMetabolite")
     def fixMetabolite(self, mtb, val, trajectory=None, isDerivative=False):
         """Sets fixed flag to true and mass value to init val, and gives a derivative function for the trajectory."""
         # Need to be careful to have a scalar index instead of an array to view data instead of copy
