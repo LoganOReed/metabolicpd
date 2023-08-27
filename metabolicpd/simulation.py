@@ -73,6 +73,7 @@ class LIFE_Network:
 
     """
 
+    # TODO: Create local variable that uses t's and num_samples to get max step size for simulation
     @conditional_timer("__init__")
     def __init__(
         self,
@@ -271,17 +272,32 @@ class LIFE_Network:
     # rough comments until I know things work
     # t_0 : start, t: end, t_eval: list of points between t_0,t that the func will evaluate at.
     @conditional_timer("simulate")
-    def simulate(self, events=None, rtol=1e-4, atol=1e-5, min_step=0.1):
+    def simulate(self, rtol=1e-4, atol=1e-5, max_step=np.inf):
         """Runs the simulation."""
-        sol = scp.solve_ivp(
-            self.__s_function,
-            (self.t_0, self.t),
-            self.mass,
-            t_eval=self.t_eval,
-            rtol=rtol,
-            atol=atol,
+        ts = []
+        xs = []
+        sol = scp.RK45(
+            self.__s_function, self.t_0, self.mass, self.t, max_step=max_step
         )
-        return sol
+        # options are 'running' 'finished' or 'failed'
+
+        # for i in range(100):
+        # sol.step()
+        while sol.status == "running":
+            sol.step()
+            ts.append(sol.t)
+            xs.append(sol.y)
+
+        tt = np.array(ts)
+        yy = np.stack(xs)
+        # print("XSXSXSXS")
+        # print(tt)
+        # print(tt.shape)
+        # print(yy)
+        # print(yy.shape)
+
+        res = {"t": tt, "y": yy.T}
+        return res
 
     @conditional_timer("simulate_pos")
     def simulate_prototype_pos_def(
@@ -423,13 +439,13 @@ if __name__ == "__main__":
     # Set initial value without fixing metabolite
     network.setInitialValue("clearance_0", 0.0)
 
-    result = network.simulate()
-    logger.warning(result.message)
+    # result = network.simulate(max_step=0.5)
+    result = network.simulate(max_step=0.5)
 
     # Create and print results to file
-    respr = pd.DataFrame(result.y.T, columns=network.mtb["name"])
-    respr.insert(0, "time", result.t)
-    respr.to_csv("data/results.csv")
+    # respr = pd.DataFrame(result.y.T, columns=network.mtb["name"])
+    # respr.insert(0, "time", result.t)
+    # respr.to_csv("data/results.csv")
 
     # takes in xlsx, (optional) initial mass/flux, (optional) simulation time
     # gives result of simulation, interfaces for plotting/saving/analysing
