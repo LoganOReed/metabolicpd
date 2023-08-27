@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 # example2: most basic example, uses default for almost everything
 import numpy as np
 

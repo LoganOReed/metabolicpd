@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 # Example3: Very small metabolic graph with no virtual nodes
 # has fixed mass, flux and custom min function
 

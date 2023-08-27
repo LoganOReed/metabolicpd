@@ -1,10 +1,12 @@
+# -*- coding: utf-8 -*-
+
 import numpy as np
 
 from metabolicpd.life import network
 
 if __name__ == "__main__":
     s = network.Metabolic_Graph(
-        file="data/simple_pd_network.xlsx",
+        file="data/ssimple_pd_network.xlsx",
         mass=None,  # Makes the masses random via constructor
         flux=np.random.default_rng().uniform(0.1, 0.8, 28),
         min_func=lambda mass, idxs: np.min(mass[idxs]),

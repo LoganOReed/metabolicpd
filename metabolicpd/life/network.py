@@ -13,6 +13,7 @@ from metabolicpd.life import util
 
 
 # TODO: Create option to save numpy array to avoid initializing same data over and over
+# TODO: Look into designing better data file format to read in from and add conversion to "io"
 class Metabolic_Graph:
     """Implements the pipeline outlined in the associated paper.
 
@@ -30,7 +31,9 @@ class Metabolic_Graph:
 
     """
 
-    # TODO: Create local variable that uses t's and num_samples to get max step size for simulation
+    # TODO: make a list of a couple interesting argument values for test cases
+    # TODO: design dataframe for outputting simulation results
+    # TODO: Write function that saves resultant data to file
     def __init__(
         self,
         file=None,
@@ -55,8 +58,11 @@ class Metabolic_Graph:
         if file is None:
             raise ValueError("A file path must be given.")
         else:
-            self.network = pd.read_excel(file)
-            unique_entries = np.unique(self.network[["tail", "head"]].values)
+            try:
+                self.network = pd.read_excel(file)
+                unique_entries = np.unique(self.network[["tail", "head"]].values)
+            except FileNotFoundError as e:
+                print("File not found with given name", e)
 
         # Gather list of metabolites in network
         metabolites = []
@@ -190,9 +196,9 @@ class Metabolic_Graph:
         mass_diag = self.__mass_diagonal(mass)
         return ((uber_diag @ mass_diag) @ self.hyper_edges + self.source_edges).T
 
+    # TODO: Docstring
     def __mass_diagonal(self, mass):
         mass_diag = np.zeros((self.num_edges, self.num_edges))
-        # Temp import from old method for testing
         for row in self.network[["tail", "head", "uber"]].itertuples():
             row_index = row.Index
             idxs = self.substrates[row_index]
@@ -200,6 +206,7 @@ class Metabolic_Graph:
             mass_diag[row_index, row_index] = min_sub
         return mass_diag
 
+    # TODO: Docstring
     def __uber_diagonal(self, mass):
         u_t = np.zeros(self.num_edges)
         u_t.fill(1.0)
@@ -215,6 +222,7 @@ class Metabolic_Graph:
 
         return np.diagflat(u_t)
 
+    # TODO: Docstring
     def __s_function(self, t, x):
         fixed_idx = self.mtb[self.mtb["fixed"]]["index"]
         der = self.create_S_matrix(x) @ self.flux
@@ -223,7 +231,6 @@ class Metabolic_Graph:
             der[i] = self.fixed_trajectories[i](t)
         return der
 
-    # TODO: Look into switching to scipy.integrate.RK45 explicity
     # TODO: Ask Chris if we need to force x being positive
     # TODO: Docstring
     # Allows access to step function which would make setting specific values easier
@@ -304,7 +311,3 @@ def basic_plot(result, network, mtb_to_plot, ylim=[0, 3]):
 
 if __name__ == "__main__":
     print("network.py is not intended to be main, use an example or call in a script.")
-
-    # TODO: make a list of a couple interesting argument values for test cases
-    # TODO: design dataframe for outputting simulation results
-    # TODO: Write function that saves resultant data to file
