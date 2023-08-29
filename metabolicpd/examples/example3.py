@@ -17,7 +17,7 @@ if __name__ == "__main__":
 
     min_network = network.Metabolic_Graph(
         file="data/minimal_example.xlsx",
-        mass=np.array([3, 2, 5]),
+        mass=np.array([3, 2, 1]),
         flux=np.array([1, 3, 3, 2]),
         ffunc=lambda mass, idx: mass[idx],
         min_func=min_min,

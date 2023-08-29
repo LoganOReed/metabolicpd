@@ -56,14 +56,8 @@ class Metabolic_Graph:
         )
 
         # read graph/network from clean file
-        if file is None:
-            raise ValueError("A file path must be given.")
-        else:
-            try:
-                self.network = pd.read_excel(file)
-                unique_entries = np.unique(self.network[["tail", "head"]].values)
-            except FileNotFoundError as e:
-                print("File not found with given name", e)
+        self.network = pd.read_excel(file)
+        unique_entries = np.unique(self.network[["tail", "head"]].values)
 
         # Gather list of metabolites in network
         metabolites = []
