@@ -9,11 +9,10 @@ if __name__ == "__main__":
         file="data/simple_pd_network.xlsx",
         mass=None,  # Makes the masses random via constructor
         flux=np.random.default_rng().uniform(0.1, 0.8, 28),
-        min_func=lambda mass, idxs: np.min(mass[idxs]),
         source_weights=None,
         t_0=0,
         t=15,
-        num_samples=50,
+        num_samples=100,
     )
 
     # The three ways of directly controlling metabolites
@@ -21,7 +20,7 @@ if __name__ == "__main__":
     # 2. fix initial value and force it to be constant
     # 3. set initial value (can also be done in Metabolic_Graph.mass)
     #    doesn't control trajectory
-    s.fixMetabolite("gba_0", 2.5, -np.sin(s.t_eval), isDerivative=False)
+    s.fixMetabolite("gba_0", 2.5, -np.sin(s.t_eval), isDerivative=True)
     s.fixMetabolite("a_syn_0", 1.5)
     s.setInitialValue("clearance_0", 0.0)
 

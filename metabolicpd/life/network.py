@@ -2,7 +2,7 @@
 
 import platform
 import re
-from typing import Callable, Optional
+from typing import Any, Callable, Optional
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -21,17 +21,24 @@ class Metabolic_Graph:
     """Implements the pipeline outlined in the associated paper.
 
     Attributes:
-        network (DataFrame): Stores the graph/network for the system.
-        mtb (ndarray): A Structured numpy array which stores name, type, fixed, and index values for meetabolites
-        mass (ndarray): Current masses for metabolites, indices matching `df`'s indices
-        flux (ndarray): Current fluxes for the network, indices matching `df`'s indices
-        ffunc (function): A differentiable, strictly increasing function used in flux computations.
-        min_func (function): A function which chooses the weight of edges between real metabolites
-        source_weights (ndarray): An array which contains the weights of each source node
-        t_0 (float): Initial time value for simulation
-        t (float): Final time value for simulation
-        num_samples (int): Number of sample points for simulation to return between t_0 and t.
-
+        file:
+          A string to the xlsx file containing the structure of the metabolic network.
+        mass:
+          A list of positive floats of length equal to the number of metabolites in the network.
+        flux:
+          A list of floats of length equal to the number of edges in the network
+        ffunc:
+          Either a differentiable, strictly increasing function or a list of floats which take the y value of the desired function for the t values in t_eval
+        min_func:
+          A function which decides the edge weight between actual (rather than virtual) metabolites.
+        source_weights:
+          A list of floats which correspond to the weights of each source nodes (equivalently their edges).
+        t_0:
+          Initial time value used when running simulation.
+        t:
+          Final time value used when running simulation.
+        t_eval:
+          A list of floating points in (t_0, t) used as sample points when fixing metabolite trajectories.
     """
 
     # TODO: make a list of a couple interesting argument values for test cases
@@ -41,7 +48,7 @@ class Metabolic_Graph:
         self,
         file: Optional[str] = None,
         mass: Optional[list[float]] = None,
-        flux: Optional[list[float]] = None,
+        flux: Optional[np.ndarray[Any, np.dtype[np.float64]]] = None,
         ffunc: Optional[Callable[[list[float], list[float]], float]] = None,
         min_func: Optional[Callable[[list[float], list[float]], float]] = None,
         source_weights: Optional[list[float]] = None,
@@ -52,10 +59,7 @@ class Metabolic_Graph:
         # setup simulation evaulation points
         self.t_0 = t_0
         self.t = t
-        self.num_samples = num_samples
-        self.t_eval, self.step_size = np.linspace(
-            self.t_0, self.t, self.num_samples, retstep=True
-        )
+        self.t_eval, _ = np.linspace(self.t_0, self.t, num_samples, retstep=True)
 
         # read graph/network from clean file
         self.network: pd.DataFrame = pd.read_excel(file)
@@ -68,12 +72,12 @@ class Metabolic_Graph:
             for ele in elements:
                 metabolites.append(ele)
         new_unique_metabolites = list(dict.fromkeys(metabolites))
-        self.num_mtb = len(new_unique_metabolites)
-        self.num_edges = self.network.shape[0]
+        num_mtb = len(new_unique_metabolites)
+        self._num_edges = self.network.shape[0]
 
         if mass is None:
             np.random.default_rng()
-            self.mass = np.random.rand(self.num_mtb)
+            self.mass = np.random.rand(num_mtb)
         else:
             self.mass = mass
 
@@ -111,7 +115,7 @@ class Metabolic_Graph:
                 metabolite_types.append("actual")
 
         self.mtb: npt.ArrayLike = np.zeros(
-            self.num_mtb,
+            num_mtb,
             dtype={
                 "names": ("name", "type", "fixed", "index"),
                 "formats": ("<U32", "<U6", "bool", "<i4"),
@@ -125,7 +129,7 @@ class Metabolic_Graph:
         # TODO: Come up with input that is easier for user
         if source_weights is None:
             temp_list = []
-            for i in range(self.num_mtb):
+            for i in range(num_mtb):
                 temp_list.append(1)
             self.source_weights = np.array(temp_list)
         else:
@@ -134,9 +138,9 @@ class Metabolic_Graph:
         # Create member dict for potential fixed metabolites
         self.fixed_trajectories = {}
 
-        self.hyper_edges = np.zeros((self.network.shape[0], self.num_mtb))
-        self.source_edges = np.zeros((self.network.shape[0], self.num_mtb))
-        uber_mods = np.zeros((self.network.shape[0], self.num_mtb))
+        self.hyper_edges = np.zeros((self.network.shape[0], num_mtb))
+        self.source_edges = np.zeros((self.network.shape[0], num_mtb))
+        uber_mods = np.zeros((self.network.shape[0], num_mtb))
 
         self.substrates = []
         # Generate lookup tables for s matrix functions
@@ -190,7 +194,7 @@ class Metabolic_Graph:
             A numpy array representing the S matrix for the current metabolite masses.
         """
         # Compute Uber Diagonal
-        u_t = np.zeros(self.num_edges)
+        u_t = np.zeros(self._num_edges)
         u_t.fill(1.0)
         for i in range(len(self.uber_enhancers[0])):
             u_t[self.uber_enhancers[0][i]] = u_t[
@@ -204,7 +208,7 @@ class Metabolic_Graph:
         uber_diag = np.diagflat(u_t)
 
         # Compute diagonal for the mass
-        mass_diag = np.zeros((self.num_edges, self.num_edges))
+        mass_diag = np.zeros((self._num_edges, self._num_edges))
         for row in self.network[["tail", "head", "uber"]].itertuples():
             row_index = row.Index
             idxs = self.substrates[row_index]
@@ -222,19 +226,19 @@ class Metabolic_Graph:
             der[i] = self.fixed_trajectories[i](t)
         return der
 
-    # TODO: Ask Chris if we need to force x being positive
-    # TODO: Docstring
     # Allows access to step function which would make setting specific values easier
-    # rough comments until I know things work
     def simulate(self):
         """Runs the simulation."""
         ts = []
         xs = []
         sol = scp.RK45(
-            self.__s_function, self.t_0, self.mass, self.t, max_step=self.step_size  # type: ignore
+            self.__s_function,
+            self.t_0,
+            self.mass,
+            self.t,
+            max_step=(self.t_eval[1] - self.t_eval[0]),
         )
         # options are 'running' 'finished' or 'failed'
-
         while sol.status == "running":
             sol.step()
             ts.append(sol.t)
@@ -246,7 +250,7 @@ class Metabolic_Graph:
         return res
 
     def fixMetabolite(
-        self, mtb_name: str, val: np.floating, trajectory=None, isDerivative=False
+        self, mtb_name: str, val: float, trajectory=None, isDerivative=False
     ):
         """Sets fixed flag to true and mass value to init val, and gives a derivative function for the trajectory."""
         # Need to be careful to have a scalar index instead of an array to view data instead of copy
@@ -256,7 +260,7 @@ class Metabolic_Graph:
 
         self.mass[idx] = val  # type: ignore
         if trajectory is None:
-            trajectory = np.zeros(self.num_samples)
+            trajectory = np.zeros(self.t_eval.shape[0])
             isDerivative = True
         else:
             # convert function to ndarray if needed
@@ -264,10 +268,15 @@ class Metabolic_Graph:
                 trajectory = trajectory(self.t_eval)
 
         if not isDerivative:
-            trajectory = np.diff(trajectory) / self.step_size
+            trajectory = np.diff(trajectory) / (self.t_eval[1] - self.t_eval[0])
 
         self.fixed_trajectories[idx] = lambda t: trajectory[
-            int(min(np.floor(t / self.step_size), self.num_samples - 2))
+            int(
+                min(
+                    np.floor(t / (self.t_eval[1] - self.t_eval[0])),
+                    self.t_eval.shape[0] - 2,
+                )
+            )
         ]
 
     def setInitialValue(self, mtb, val):
