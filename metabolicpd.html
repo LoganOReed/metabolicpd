@@ -46,13 +46,28 @@
 <li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">metabolicpd package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#metabolicpd-example-docs-module">metabolicpd.example_docs module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#metabolicpd-import-matrix-module">metabolicpd.import_matrix module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#metabolicpd-ptr-class-module">metabolicpd.ptr_class module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#metabolicpd-read-and-plot-module">metabolicpd.read_and_plot module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#metabolicpd-simulator-module">metabolicpd.simulator module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#metabolicpd-symbolic-approach-module">metabolicpd.symbolic_approach module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-metabolicpd">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-metabolicpd.life.network">metabolicpd.life.network module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#metabolicpd.life.network.Metabolic_Graph"><code class="docutils literal notranslate"><span class="pre">Metabolic_Graph</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#metabolicpd.life.network.Metabolic_Graph.network"><code class="docutils literal notranslate"><span class="pre">Metabolic_Graph.network</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#metabolicpd.life.network.Metabolic_Graph.mtb"><code class="docutils literal notranslate"><span class="pre">Metabolic_Graph.mtb</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#metabolicpd.life.network.Metabolic_Graph.mass"><code class="docutils literal notranslate"><span class="pre">Metabolic_Graph.mass</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#metabolicpd.life.network.Metabolic_Graph.flux"><code class="docutils literal notranslate"><span class="pre">Metabolic_Graph.flux</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#metabolicpd.life.network.Metabolic_Graph.ffunc"><code class="docutils literal notranslate"><span class="pre">Metabolic_Graph.ffunc</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#metabolicpd.life.network.Metabolic_Graph.min_func"><code class="docutils literal notranslate"><span class="pre">Metabolic_Graph.min_func</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#metabolicpd.life.network.Metabolic_Graph.source_weights"><code class="docutils literal notranslate"><span class="pre">Metabolic_Graph.source_weights</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#metabolicpd.life.network.Metabolic_Graph.t_0"><code class="docutils literal notranslate"><span class="pre">Metabolic_Graph.t_0</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#metabolicpd.life.network.Metabolic_Graph.t"><code class="docutils literal notranslate"><span class="pre">Metabolic_Graph.t</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#metabolicpd.life.network.Metabolic_Graph.num_samples"><code class="docutils literal notranslate"><span class="pre">Metabolic_Graph.num_samples</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#metabolicpd.life.network.Metabolic_Graph.create_S_matrix"><code class="docutils literal notranslate"><span class="pre">Metabolic_Graph.create_S_matrix()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#metabolicpd.life.network.Metabolic_Graph.fixMetabolite"><code class="docutils literal notranslate"><span class="pre">Metabolic_Graph.fixMetabolite()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#metabolicpd.life.network.Metabolic_Graph.setInitialValue"><code class="docutils literal notranslate"><span class="pre">Metabolic_Graph.setInitialValue()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#metabolicpd.life.network.Metabolic_Graph.simulate"><code class="docutils literal notranslate"><span class="pre">Metabolic_Graph.simulate()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#metabolicpd.life.network.basic_plot"><code class="docutils literal notranslate"><span class="pre">basic_plot()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#metabolicpd-examples-example1-module">metabolicpd.examples.example1 module</a></li>
 </ul>
 </li>
 </ul>
@@ -86,27 +101,169 @@
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
 </section>
-<section id="metabolicpd-example-docs-module">
-<h2>metabolicpd.example_docs module<a class="headerlink" href="#metabolicpd-example-docs-module" title="Permalink to this heading"></a></h2>
+<section id="module-metabolicpd.life.network">
+<span id="metabolicpd-life-network-module"></span><h2>metabolicpd.life.network module<a class="headerlink" href="#module-metabolicpd.life.network" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="metabolicpd.life.network.Metabolic_Graph">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">metabolicpd.life.network.</span></span><span class="sig-name descname"><span class="pre">Metabolic_Graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flux</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ffunc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_func</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_weights</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">50</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#metabolicpd.life.network.Metabolic_Graph" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Implements the pipeline outlined in the associated paper.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="metabolicpd.life.network.Metabolic_Graph.network">
+<span class="sig-name descname"><span class="pre">network</span></span><a class="headerlink" href="#metabolicpd.life.network.Metabolic_Graph.network" title="Permalink to this definition"></a></dt>
+<dd><p>Stores the graph/network for the system.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="metabolicpd.life.network.Metabolic_Graph.mtb">
+<span class="sig-name descname"><span class="pre">mtb</span></span><a class="headerlink" href="#metabolicpd.life.network.Metabolic_Graph.mtb" title="Permalink to this definition"></a></dt>
+<dd><p>A Structured numpy array which stores name, type, fixed, and index values for meetabolites</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="metabolicpd.life.network.Metabolic_Graph.mass">
+<span class="sig-name descname"><span class="pre">mass</span></span><a class="headerlink" href="#metabolicpd.life.network.Metabolic_Graph.mass" title="Permalink to this definition"></a></dt>
+<dd><p>Current masses for metabolites, indices matching <cite>df</cite>’s indices</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="metabolicpd.life.network.Metabolic_Graph.flux">
+<span class="sig-name descname"><span class="pre">flux</span></span><a class="headerlink" href="#metabolicpd.life.network.Metabolic_Graph.flux" title="Permalink to this definition"></a></dt>
+<dd><p>Current fluxes for the network, indices matching <cite>df</cite>’s indices</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="metabolicpd.life.network.Metabolic_Graph.ffunc">
+<span class="sig-name descname"><span class="pre">ffunc</span></span><a class="headerlink" href="#metabolicpd.life.network.Metabolic_Graph.ffunc" title="Permalink to this definition"></a></dt>
+<dd><p>A differentiable, strictly increasing function used in flux computations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>function</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="metabolicpd.life.network.Metabolic_Graph.min_func">
+<span class="sig-name descname"><span class="pre">min_func</span></span><a class="headerlink" href="#metabolicpd.life.network.Metabolic_Graph.min_func" title="Permalink to this definition"></a></dt>
+<dd><p>A function which chooses the weight of edges between real metabolites</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>function</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="metabolicpd.life.network.Metabolic_Graph.source_weights">
+<span class="sig-name descname"><span class="pre">source_weights</span></span><a class="headerlink" href="#metabolicpd.life.network.Metabolic_Graph.source_weights" title="Permalink to this definition"></a></dt>
+<dd><p>An array which contains the weights of each source node</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="metabolicpd.life.network.Metabolic_Graph.t_0">
+<span class="sig-name descname"><span class="pre">t_0</span></span><a class="headerlink" href="#metabolicpd.life.network.Metabolic_Graph.t_0" title="Permalink to this definition"></a></dt>
+<dd><p>Initial time value for simulation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="metabolicpd.life.network.Metabolic_Graph.t">
+<span class="sig-name descname"><span class="pre">t</span></span><a class="headerlink" href="#metabolicpd.life.network.Metabolic_Graph.t" title="Permalink to this definition"></a></dt>
+<dd><p>Final time value for simulation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="metabolicpd.life.network.Metabolic_Graph.num_samples">
+<span class="sig-name descname"><span class="pre">num_samples</span></span><a class="headerlink" href="#metabolicpd.life.network.Metabolic_Graph.num_samples" title="Permalink to this definition"></a></dt>
+<dd><p>Number of sample points for simulation to return between t_0 and t.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metabolicpd.life.network.Metabolic_Graph.create_S_matrix">
+<span class="sig-name descname"><span class="pre">create_S_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mass</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#metabolicpd.life.network.Metabolic_Graph.create_S_matrix" title="Permalink to this definition"></a></dt>
+<dd><p>Create the ‘S’ matrix, representing the dynamics for the network x’ = S(x) * f.</p>
+<p>The form of the ‘S’ matrix comes follows LIFE dynamics, with edges in the network corresponding to columns in the
+matrix and metabolites in the network corresponding to the rows of the matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>mass</strong> (<em>ndarray</em>) – Numpy array of masses to construct the S matrix based off of.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A numpy array representing the S matrix for the current metabolite masses.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metabolicpd.life.network.Metabolic_Graph.fixMetabolite">
+<span class="sig-name descname"><span class="pre">fixMetabolite</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mtb_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">floating</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trajectory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isDerivative</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#metabolicpd.life.network.Metabolic_Graph.fixMetabolite" title="Permalink to this definition"></a></dt>
+<dd><p>Sets fixed flag to true and mass value to init val, and gives a derivative function for the trajectory.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metabolicpd.life.network.Metabolic_Graph.setInitialValue">
+<span class="sig-name descname"><span class="pre">setInitialValue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mtb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#metabolicpd.life.network.Metabolic_Graph.setInitialValue" title="Permalink to this definition"></a></dt>
+<dd><p>Sets mass value to vals.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="metabolicpd.life.network.Metabolic_Graph.simulate">
+<span class="sig-name descname"><span class="pre">simulate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#metabolicpd.life.network.Metabolic_Graph.simulate" title="Permalink to this definition"></a></dt>
+<dd><p>Runs the simulation.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="metabolicpd.life.network.basic_plot">
+<span class="sig-prename descclassname"><span class="pre">metabolicpd.life.network.</span></span><span class="sig-name descname"><span class="pre">basic_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">result</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#metabolicpd.life.network.Metabolic_Graph" title="metabolicpd.life.network.Metabolic_Graph"><span class="pre">Metabolic_Graph</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">mtb_to_plot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">3]</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#metabolicpd.life.network.basic_plot" title="Permalink to this definition"></a></dt>
+<dd><p>Creates a plot showing the metabolites <cite>mtb_to_plot</cite> using Metabolic_Graph data.</p>
+</dd></dl>
+
 </section>
-<section id="metabolicpd-import-matrix-module">
-<h2>metabolicpd.import_matrix module<a class="headerlink" href="#metabolicpd-import-matrix-module" title="Permalink to this heading"></a></h2>
-</section>
-<section id="metabolicpd-ptr-class-module">
-<h2>metabolicpd.ptr_class module<a class="headerlink" href="#metabolicpd-ptr-class-module" title="Permalink to this heading"></a></h2>
-</section>
-<section id="metabolicpd-read-and-plot-module">
-<h2>metabolicpd.read_and_plot module<a class="headerlink" href="#metabolicpd-read-and-plot-module" title="Permalink to this heading"></a></h2>
-</section>
-<section id="metabolicpd-simulator-module">
-<h2>metabolicpd.simulator module<a class="headerlink" href="#metabolicpd-simulator-module" title="Permalink to this heading"></a></h2>
-</section>
-<section id="metabolicpd-symbolic-approach-module">
-<h2>metabolicpd.symbolic_approach module<a class="headerlink" href="#metabolicpd-symbolic-approach-module" title="Permalink to this heading"></a></h2>
-</section>
-<section id="module-metabolicpd">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-metabolicpd" title="Permalink to this heading"></a></h2>
-</section>
+<section id="metabolicpd-examples-example1-module">
+<h2>metabolicpd.examples.example1 module<a class="headerlink" href="#metabolicpd-examples-example1-module" title="Permalink to this heading"></a></h2>
+<span class="target" id="module-metabolicpd.examples.example1"></span></section>
 </section>
 
 
@@ -119,7 +276,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2023, Logan Reed, Chris Denaro.</p>
+    <p>&#169; Copyright 2023, Logan Reed.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
