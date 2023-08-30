@@ -14,21 +14,22 @@ import seaborn as sns
 from metabolicpd.life import util
 
 
-# TODO: Create option to save numpy array to avoid initializing same data over and over
 # TODO: Look into designing better data file format to read in from and add conversion to "io"
 # TODO: Look into using GraphML as storage
+# TODO: Make flowchart for simulation function calls
 class Metabolic_Graph:
     """Implements the pipeline outlined in the associated paper.
 
     Attributes:
-        file:
-          A string to the xlsx file containing the structure of the metabolic network.
+        network:
+          A pandas dataframe containing the structure of the metabolic network.
         mass:
           A list of positive floats of length equal to the number of metabolites in the network.
         flux:
           A list of floats of length equal to the number of edges in the network
         ffunc:
-          Either a differentiable, strictly increasing function or a list of floats which take the y value of the desired function for the t values in t_eval
+          A list of floats which take the y value of the desired function for the t values in t_eval.
+          The sampled function must be differentiable and strictly increasing.
         min_func:
           A function which decides the edge weight between actual (rather than virtual) metabolites.
         source_weights:
@@ -41,8 +42,6 @@ class Metabolic_Graph:
           A list of floating points in (t_0, t) used as sample points when fixing metabolite trajectories.
     """
 
-    # TODO: make a list of a couple interesting argument values for test cases
-    # TODO: design dataframe for outputting simulation results
     # TODO: Write function that saves resultant data to file
     def __init__(
         self,
@@ -50,16 +49,42 @@ class Metabolic_Graph:
         mass: Optional[np.ndarray[Any, np.dtype[np.float64]]] = None,
         flux: Optional[np.ndarray[Any, np.dtype[np.float64]]] = None,
         ffunc: Optional[
-            Callable[[np.ndarray[Any, np.dtype[np.float64]], list[float]], float]
+            Callable[[np.ndarray[Any, np.dtype[np.float64]], int], float]
         ] = None,
         min_func: Optional[
-            Callable[[np.ndarray[Any, np.dtype[np.float64]], list[float]], float]
+            Callable[[np.ndarray[Any, np.dtype[np.float64]], int], float]
         ] = None,
-        source_weights: Optional[list[float]] = None,
+        source_weights: Optional[np.ndarray[Any, np.dtype[np.float64]]] = None,
         t_0: float | int = 0,
         t: float | int = 10,
         num_samples: int = 50,
     ) -> None:
+        """Initializes member variables and computes variables needed for the simulation.
+
+        During the initialization, we compute multiple values and store them in private member variables.
+        This allows us to use these values as a lookup table during the simulation computation, saving immense time compared to computing the same values every loop.
+        The exception to this occurs when the simulation is short, but init will still occur a relatively small time cost.
+
+        Args:
+         file:
+          A string to the xlsx file containing the structure of the metabolic network.
+         mass:
+           A list of positive floats of length equal to the number of metabolites in the network.
+         flux:
+           A list of floats of length equal to the number of edges in the network
+         ffunc:
+           Either a differentiable, strictly increasing function or a list of floats which take the y value of the desired function for the t values in t_eval
+         min_func:
+           A function which decides the edge weight between actual (rather than virtual) metabolites.
+         source_weights:
+           A list of floats which correspond to the weights of each source nodes (equivalently their edges).
+         t_0:
+           Initial time value used when running simulation.
+         t:
+           Final time value used when running simulation.
+         num_samples:
+           An integer which determines the max step size for the simulation and is used to compute t_eval.
+        """
         # setup simulation evaulation points
         self.t_0 = t_0
         self.t = t

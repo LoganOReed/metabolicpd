@@ -17,4 +17,6 @@ if __name__ == "__main__":
         num_samples=500,
     )
     result = cctb_network.simulate()
-    network.basic_plot(result, cctb_network, [0, 1, 2, 3, 4, 5, 6, 7, 8])
+    network.basic_plot(
+        result, cctb_network, [0, 1, 2, 3, 4, 5, 6, 7, 8], ylim=[-0.1, 8]
+    )
