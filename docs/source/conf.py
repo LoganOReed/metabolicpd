@@ -12,8 +12,8 @@ import sys
 sys.path.insert(0, os.path.abspath("../../metabolicpd/"))
 
 project = "Metabolic LIFE"
-copyright = "2023, Logan Reed, Chris Denaro"
-author = "Logan Reed, Chris Denaro"
+copyright = "2023, Logan Reed"
+author = "Logan Reed"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -24,10 +24,13 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.todo",
     "sphinx.ext.githubpages",
+    "sphinx.ext.coverage",
 ]
 
 templates_path = ["_templates"]
 exclude_patterns = []
+
+coverage_show_missing_items = True
 
 
 # -- Options for HTML output -------------------------------------------------

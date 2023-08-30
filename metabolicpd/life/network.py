@@ -2,9 +2,11 @@
 
 import platform
 import re
+from typing import Callable, Optional
 
 import matplotlib.pyplot as plt
 import numpy as np
+import numpy.typing as npt
 import pandas as pd
 import scipy.integrate as scp
 import seaborn as sns
@@ -37,16 +39,16 @@ class Metabolic_Graph:
     # TODO: Write function that saves resultant data to file
     def __init__(
         self,
-        file=None,
-        mass=None,
-        flux=None,
-        ffunc=None,
-        min_func=None,
-        source_weights=None,
-        t_0=0,
-        t=10,
-        num_samples=50,
-    ):
+        file: Optional[str] = None,
+        mass: Optional[list[float]] = None,
+        flux: Optional[list[float]] = None,
+        ffunc: Optional[Callable[[list[float], list[float]], float]] = None,
+        min_func: Optional[Callable[[list[float], list[float]], float]] = None,
+        source_weights: Optional[list[float]] = None,
+        t_0: float | int = 0,
+        t: float | int = 10,
+        num_samples: int = 50,
+    ) -> None:
         # setup simulation evaulation points
         self.t_0 = t_0
         self.t = t
@@ -56,7 +58,7 @@ class Metabolic_Graph:
         )
 
         # read graph/network from clean file
-        self.network = pd.read_excel(file)
+        self.network: pd.DataFrame = pd.read_excel(file)
         unique_entries = np.unique(self.network[["tail", "head"]].values)
 
         # Gather list of metabolites in network
@@ -108,7 +110,7 @@ class Metabolic_Graph:
             else:  # if we didn't find a source or sink term, then it must be an actual metabolite!
                 metabolite_types.append("actual")
 
-        self.mtb = np.zeros(
+        self.mtb: npt.ArrayLike = np.zeros(
             self.num_mtb,
             dtype={
                 "names": ("name", "type", "fixed", "index"),
@@ -187,22 +189,7 @@ class Metabolic_Graph:
         Returns:
             A numpy array representing the S matrix for the current metabolite masses.
         """
-        uber_diag = self.__uber_diagonal(mass)
-        mass_diag = self.__mass_diagonal(mass)
-        return ((uber_diag @ mass_diag) @ self.hyper_edges + self.source_edges).T
-
-    # TODO: Docstring
-    def __mass_diagonal(self, mass):
-        mass_diag = np.zeros((self.num_edges, self.num_edges))
-        for row in self.network[["tail", "head", "uber"]].itertuples():
-            row_index = row.Index
-            idxs = self.substrates[row_index]
-            min_sub = self.min_func(mass, idxs)
-            mass_diag[row_index, row_index] = min_sub
-        return mass_diag
-
-    # TODO: Docstring
-    def __uber_diagonal(self, mass):
+        # Compute Uber Diagonal
         u_t = np.zeros(self.num_edges)
         u_t.fill(1.0)
         for i in range(len(self.uber_enhancers[0])):
@@ -214,12 +201,21 @@ class Metabolic_Graph:
             u_t[self.uber_inhibiters[0][i]] = u_t[
                 self.uber_inhibiters[0][i]
             ] / self.ffunc(mass, self.uber_inhibiters[1][i])
+        uber_diag = np.diagflat(u_t)
 
-        return np.diagflat(u_t)
+        # Compute diagonal for the mass
+        mass_diag = np.zeros((self.num_edges, self.num_edges))
+        for row in self.network[["tail", "head", "uber"]].itertuples():
+            row_index = row.Index
+            idxs = self.substrates[row_index]
+            min_sub = self.min_func(mass, idxs)
+            mass_diag[row_index, row_index] = min_sub
+
+        return ((uber_diag @ mass_diag) @ self.hyper_edges + self.source_edges).T
 
     # TODO: Docstring
     def __s_function(self, t, x):
-        fixed_idx = self.mtb[self.mtb["fixed"]]["index"]
+        fixed_idx = self.mtb[self.mtb["fixed"]]["index"]  # type: ignore
         der = self.create_S_matrix(x) @ self.flux
         # replaces computed derivative with one which we control
         for i in fixed_idx:
@@ -235,7 +231,7 @@ class Metabolic_Graph:
         ts = []
         xs = []
         sol = scp.RK45(
-            self.__s_function, self.t_0, self.mass, self.t, max_step=self.step_size
+            self.__s_function, self.t_0, self.mass, self.t, max_step=self.step_size  # type: ignore
         )
         # options are 'running' 'finished' or 'failed'
 
@@ -249,14 +245,16 @@ class Metabolic_Graph:
         res = {"t": tt, "y": yy.T}
         return res
 
-    def fixMetabolite(self, mtb, val, trajectory=None, isDerivative=False):
+    def fixMetabolite(
+        self, mtb_name: str, val: np.floating, trajectory=None, isDerivative=False
+    ):
         """Sets fixed flag to true and mass value to init val, and gives a derivative function for the trajectory."""
         # Need to be careful to have a scalar index instead of an array to view data instead of copy
-        idx = self.mtb[self.mtb["name"] == mtb]["index"][0]
-        f_mtb = self.mtb[idx]
-        f_mtb["fixed"] = True
+        idx = self.mtb[self.mtb["name"] == mtb_name]["index"][0]  # type: ignore
+        f_mtb = self.mtb[idx]  # type: ignore
+        f_mtb["fixed"] = True  # type: ignore
 
-        self.mass[idx] = val
+        self.mass[idx] = val  # type: ignore
         if trajectory is None:
             trajectory = np.zeros(self.num_samples)
             isDerivative = True
@@ -276,12 +274,17 @@ class Metabolic_Graph:
         """Sets mass value to vals."""
         # All of the lines that look like below are temporary hopefully
         # (From Switching to singleton mtb instead of lists)
-        idx = self.mtb[self.mtb["name"] == mtb]["index"][0]
-        self.mass[idx] = val
+        idx = self.mtb[self.mtb["name"] == mtb]["index"][0]  # type: ignore
+        self.mass[idx] = val  # type: ignore
 
 
 # TODO: Maybe move into class or make plot file
-def basic_plot(result, network, mtb_to_plot, ylim=[0, 3]):
+def basic_plot(
+    result: dict[str, list[float]],
+    network: Metabolic_Graph,
+    mtb_to_plot: list[int],
+    ylim=[0, 3],
+) -> None:
     """Creates a plot showing the metabolites `mtb_to_plot` using Metabolic_Graph data."""
     # Setup different plt backend for kitty term
     if platform.system() == "Linux":
@@ -292,7 +295,7 @@ def basic_plot(result, network, mtb_to_plot, ylim=[0, 3]):
     sns.set_context("talk")
 
     metabolites_to_plot = mtb_to_plot
-    mtb_names = network.mtb[metabolites_to_plot]["name"]
+    mtb_names = network.mtb[metabolites_to_plot]["name"]  # type: ignore
     label_idx = 0
     for i in metabolites_to_plot:
         plt.plot(result["t"], result["y"][i], label=mtb_names[label_idx])
