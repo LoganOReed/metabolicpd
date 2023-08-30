@@ -13,8 +13,8 @@ if __name__ == "__main__":
         flux=np.random.default_rng().uniform(0.1, 0.8, 20),
         source_weights=None,
         t_0=0,
-        t=15,
-        num_samples=50,
+        t=50,
+        num_samples=500,
     )
     result = cctb_network.simulate()
     network.basic_plot(result, cctb_network, [0, 1, 2, 3, 4, 5, 6, 7, 8])

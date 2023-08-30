@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 # Example3: Very small metabolic graph with no virtual nodes
 # has fixed mass, flux and custom min function
 
@@ -17,9 +15,9 @@ if __name__ == "__main__":
 
     min_network = network.Metabolic_Graph(
         file="data/minimal_example.xlsx",
-        mass=np.array([3, 2, 1]),
+        mass=np.array([3, 2, 5]),
         flux=np.array([1, 3, 3, 2]),
-        ffunc=lambda mass, idx: mass[idx],
+        ffunc=lambda mass, idx: mass[idx],  # type: ignore
         min_func=min_min,
         source_weights=None,
         t_0=0,

@@ -47,10 +47,14 @@ class Metabolic_Graph:
     def __init__(
         self,
         file: Optional[str] = None,
-        mass: Optional[list[float]] = None,
+        mass: Optional[np.ndarray[Any, np.dtype[np.float64]]] = None,
         flux: Optional[np.ndarray[Any, np.dtype[np.float64]]] = None,
-        ffunc: Optional[Callable[[list[float], list[float]], float]] = None,
-        min_func: Optional[Callable[[list[float], list[float]], float]] = None,
+        ffunc: Optional[
+            Callable[[np.ndarray[Any, np.dtype[np.float64]], list[float]], float]
+        ] = None,
+        min_func: Optional[
+            Callable[[np.ndarray[Any, np.dtype[np.float64]], list[float]], float]
+        ] = None,
         source_weights: Optional[list[float]] = None,
         t_0: float | int = 0,
         t: float | int = 10,
@@ -129,7 +133,7 @@ class Metabolic_Graph:
         # TODO: Come up with input that is easier for user
         if source_weights is None:
             temp_list = []
-            for i in range(num_mtb):
+            for _ in range(num_mtb):
                 temp_list.append(1)
             self.source_weights = np.array(temp_list)
         else:
@@ -181,14 +185,15 @@ class Metabolic_Graph:
 
     # NOTE: I've set this up so ideally it will only be called by the "simulation" function once written
     # TODO: Write Documentation for new member variables, write example use case
-    def create_S_matrix(self, mass):
+    def create_S_matrix(self, mass: np.ndarray[Any, np.dtype[np.float64]]):
         """Create the 'S' matrix, representing the dynamics for the network x' = S(x) * f.
 
         The form of the 'S' matrix comes follows LIFE dynamics, with edges in the network corresponding to columns in the
         matrix and metabolites in the network corresponding to the rows of the matrix.
 
         Args:
-            mass (ndarray): Numpy array of masses to construct the S matrix based off of.
+            mass:
+              Numpy array of masses to construct the S matrix based off of.
 
         Returns:
             A numpy array representing the S matrix for the current metabolite masses.
