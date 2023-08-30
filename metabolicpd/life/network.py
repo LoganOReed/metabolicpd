@@ -280,7 +280,17 @@ class Metabolic_Graph:
         return res
 
     def fixMetabolite(
-        self, mtb_name: str, val: float, trajectory=None, isDerivative=False
+        self,
+        mtb_name: str,
+        val: float,
+        trajectory: Optional[
+            np.ndarray[Any, np.dtype[np.float64]]
+            | Callable[
+                [np.ndarray[Any, np.dtype[np.float64]]],
+                np.ndarray[Any, np.dtype[np.float64]],
+            ]
+        ] = None,
+        isDerivative=False,
     ):
         """Sets fixed flag to true and mass value to init val, and gives a derivative function for the trajectory."""
         # Need to be careful to have a scalar index instead of an array to view data instead of copy
@@ -295,12 +305,12 @@ class Metabolic_Graph:
         else:
             # convert function to ndarray if needed
             if type(trajectory) is not np.ndarray:
-                trajectory = trajectory(self.t_eval)
+                trajectory = trajectory(self.t_eval)  # type: ignore
 
         if not isDerivative:
-            trajectory = np.diff(trajectory) / (self.t_eval[1] - self.t_eval[0])
+            trajectory = np.diff(trajectory) / (self.t_eval[1] - self.t_eval[0])  # type: ignore
 
-        self.fixed_trajectories[idx] = lambda t: trajectory[
+        self.fixed_trajectories[idx] = lambda t: trajectory[  # type: ignore
             int(
                 min(
                     np.floor(t / (self.t_eval[1] - self.t_eval[0])),
@@ -309,7 +319,7 @@ class Metabolic_Graph:
             )
         ]
 
-    def setInitialValue(self, mtb, val):
+    def setInitialValue(self, mtb: str, val: float):
         """Sets mass value to vals."""
         # All of the lines that look like below are temporary hopefully
         # (From Switching to singleton mtb instead of lists)
