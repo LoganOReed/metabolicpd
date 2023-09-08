@@ -102,6 +102,4 @@ class Test_Metabolic_Graph:
         assert np.allclose(
             np.sort(np.array(computed_result["y"].T[-1])),
             np.sort(expected_result),
-            rtol=1e-3,
-            atol=1e-5,
         )

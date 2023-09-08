@@ -6,7 +6,5 @@ __pycache__/
 # C extensions
 *.so
 
-# temp
-old_simulation.py
-temp/
-
+# Public KEGG Data
+data/kegg
