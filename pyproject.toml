@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "metabolicpd"
-version = "0.1.0"
+version = "0.1.1"
 description = ""
 authors = ["Logan Reed <me@loganreed.org>"]
 readme = "README.md"
@@ -15,6 +15,7 @@ openpyxl = "^3.1.2"
 sympy = "^1.12"
 scipy = "^1.11.1"
 seaborn = "^0.12.2"
+biopython = "^1.81"
 
 
 

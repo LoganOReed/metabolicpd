@@ -353,6 +353,7 @@ def basic_plot(
     plt.xlabel("$t$")  # the horizontal axis represents the time
     plt.legend()  # show how the colors correspond to the components of X
     sns.despine(offset=10, trim=True)
+    plt.savefig("test.png")
     plt.show()
 
 
