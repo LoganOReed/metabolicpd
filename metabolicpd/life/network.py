@@ -89,6 +89,7 @@ class Metabolic_Graph:
         self.t_0 = t_0
         self.t = t
         self.t_eval, _ = np.linspace(self.t_0, self.t, num_samples, retstep=True)
+        self.final_masses = None
 
         # read graph/network from clean file
         self.network: pd.DataFrame = pd.read_excel(file)
@@ -276,6 +277,7 @@ class Metabolic_Graph:
 
         tt = np.array(ts)
         yy = np.stack(xs)
+        self.final_masses = yy[-1]
         res = {"t": tt, "y": yy.T}
         return res
 
@@ -325,6 +327,9 @@ class Metabolic_Graph:
         # (From Switching to singleton mtb instead of lists)
         idx = self.mtb[self.mtb["name"] == mtb]["index"][0]  # type: ignore
         self.mass[idx] = val  # type: ignore
+
+    def getFinalMasses(self):
+        pass
 
 
 # TODO: Maybe move into class or make plot file
