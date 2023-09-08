@@ -1,9 +1,12 @@
 import os
+import sys
 
 import Bio.KEGG.REST as bp
 from Bio.KEGG.KGML import KGML_parser
 
+# Directory path for kgml files (assumes you run from project root)
 out_dir = "data/kegg"
+# Carbon metabolism - Mycobacterium tuberculosis H37Rv
 kegg_id = "mtu01200"
 
 if __name__ == "__main__":
@@ -12,6 +15,11 @@ if __name__ == "__main__":
         print("Grabbing KGML using API...")
         with open(kgml_path, "w") as f:
             f.write(bp.kegg_get(kegg_id, "kgml").read())
-    with open(kgml_path) as f:
-        pathway = KGML_parser.read(f)
+    try:
+        with open(kgml_path) as f:
+            pathway = KGML_parser.read(f)
+    except OSError:
+        print("Could not open/read file: ", kgml_path)
+        sys.exit(1)
     print(pathway)
+    print("#######################")
