@@ -131,8 +131,10 @@ class Metabolic_Graph:
         metabolite_types = []
         for ele in new_unique_metabolites:
             # Using regular expression strings to identify source or sink terms in metabolite dictionary keys
-            sink_res = re.search("^[e]+[0-9]$", ele)  # starts with e, ends with #...
-            source_res = re.search("^[s]+[0-9]$", ele)  # starts with s, end with #...
+            # starts with e, ends with #...
+            sink_res = re.search("^[e]+[0-9]$", ele)
+            # starts with s, end with #...
+            source_res = re.search("^[s]+[0-9]$", ele)
             if (
                 sink_res is not None
             ):  # check if we found something in the entry that matches the format of 'e###'
@@ -283,7 +285,7 @@ class Metabolic_Graph:
 
     def fixMetabolite(
         self,
-        mtb_name: str,
+        m_name: str,
         val: float,
         trajectory: Optional[
             np.ndarray[Any, np.dtype[np.float64]]
@@ -296,7 +298,7 @@ class Metabolic_Graph:
     ):
         """Sets fixed flag to true and mass value to init val, and gives a derivative function for the trajectory."""
         # Need to be careful to have a scalar index instead of an array to view data instead of copy
-        idx = self.mtb[self.mtb["name"] == mtb_name]["index"][0]  # type: ignore
+        idx = self.mtb[self.mtb["name"] == m_name]["index"][0]  # type: ignore
         f_mtb = self.mtb[idx]  # type: ignore
         f_mtb["fixed"] = True  # type: ignore
 
@@ -310,7 +312,9 @@ class Metabolic_Graph:
                 trajectory = trajectory(self.t_eval)  # type: ignore
 
         if not isDerivative:
-            trajectory = np.diff(trajectory) / (self.t_eval[1] - self.t_eval[0])  # type: ignore
+            trajectory = np.diff(trajectory) / (
+                self.t_eval[1] - self.t_eval[0]
+            )  # type: ignore
 
         self.fixed_trajectories[idx] = lambda t: trajectory[  # type: ignore
             int(
