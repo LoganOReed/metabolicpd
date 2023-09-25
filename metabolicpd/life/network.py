@@ -43,6 +43,7 @@ class Metabolic_Graph:
     """
 
     # TODO: Write function that saves resultant data to file
+    # TODO: Use pg. 44 in LIFE Approach by Nathaniel Merrill to find basis
     def __init__(
         self,
         file: Optional[str] = None,
