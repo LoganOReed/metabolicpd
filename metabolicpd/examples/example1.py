@@ -8,7 +8,7 @@ if __name__ == "__main__":
     s = network.Metabolic_Graph(
         file="data/simple_pd_network.xlsx",
         mass=None,  # Makes the masses random via constructor
-        flux=np.random.default_rng().uniform(0.1, 0.8, 28),
+        flux=None,
         source_weights=None,
         t_0=0,
         t=15,

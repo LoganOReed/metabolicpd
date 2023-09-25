@@ -103,6 +103,7 @@ class Metabolic_Graph:
                 metabolites.append(ele)
         new_unique_metabolites = list(dict.fromkeys(metabolites))
         num_mtb = len(new_unique_metabolites)
+        # TODO: remove num_edges since its never used
         self._num_edges = self.network.shape[0]
 
         if mass is None:
@@ -117,7 +118,6 @@ class Metabolic_Graph:
             self.flux = flux
 
         if ffunc is None:
-            # self.ffunc = lambda mass, idx: np.exp(mass[idx] / (mass[idx] + 1))
             self.ffunc = lambda mass, idx: util.hill(mass[idx])
         else:
             self.ffunc = ffunc
@@ -178,7 +178,7 @@ class Metabolic_Graph:
         # Generate lookup tables for s matrix functions
         # TODO: Check with Chris that generating this once will not break edge cases
         # TODO: Check if columns will always be in this order
-        for row in self.network[["tail", "head", "uber"]].itertuples():
+        for row in self.network[["tail", "head", "uberPos", "uberNeg"]].itertuples():
             row_idx = row.Index
             sub_str = self.mtb[np.isin(self.mtb["name"], row.tail.split(", "))]["index"]
             prod_snk = self.mtb[np.isin(self.mtb["name"], row.head.split(", "))][
@@ -196,18 +196,16 @@ class Metabolic_Graph:
                 self.hyper_edges[row_idx, sub_str] = -1
                 self.hyper_edges[row_idx, prod_snk] = 1
 
-            u_m = row.uber.split(", ")
-            for uber in u_m:
-                # there should probably be some checking that happens so we don't duplicate the code in the if statements
-                if uber[-1] == "+":  # check the last term in the entry, enhancer
-                    uber_mods[
-                        row.Index, self.mtb[self.mtb["name"] == uber[:-2]]["index"]
-                    ] = 1
-                elif uber[-1] == "-":  # check the last term in the entry, enhancer
-                    uber_mods[
-                        row.Index, self.mtb[self.mtb["name"] == uber[:-2]]["index"]
-                    ] = -1
+            # Next two loops read in inhibiters(uNeg) and enhancers(uPos)
+            u_p = row.uberPos.split(", ")
+            u_n = row.uberNeg.split(", ")
+            for uber in u_p:
+                uber_mods[row.Index, self.mtb[self.mtb["name"] == uber]["index"]] = 1
 
+            for uber in u_n:
+                uber_mods[row.Index, self.mtb[self.mtb["name"] == uber]["index"]] = -1
+
+        # TODO: Condense uber_mods and uber_enhancers/inhibiters
         self.uber_enhancers = np.nonzero(uber_mods == 1)
         self.uber_inhibiters = np.nonzero(uber_mods == -1)
 
@@ -242,7 +240,7 @@ class Metabolic_Graph:
 
         # Compute diagonal for the mass
         mass_diag = np.zeros((self._num_edges, self._num_edges))
-        for row in self.network[["tail", "head", "uber"]].itertuples():
+        for row in self.network[["tail", "head", "uberPos", "uberNeg"]].itertuples():
             row_index = row.Index
             idxs = self.substrates[row_index]
             min_sub = self.min_func(mass, idxs)
