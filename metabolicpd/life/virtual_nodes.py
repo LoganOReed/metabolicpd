@@ -65,6 +65,7 @@ def add_nodes(file):
     print(sources)
     print(sinks)
 
+    # Add sinks
     for i in range(len(sinks)):
         e_name = "e" + str(i)
         print(f"{e_name} for {node_names[sinks[i]]}")
@@ -77,8 +78,23 @@ def add_nodes(file):
             }
         )
         edge_list = pd.concat([edge_list, new_row.to_frame().T], ignore_index=True)
-        print(edge_list)
+        # print(edge_list)
 
+    # Add sources
+    for i in range(len(sources)):
+        s_name = "s" + str(i)
+        print(f"{s_name} for {node_names[sources[i]]}")
+        new_row = pd.Series(
+            {
+                "tail": s_name,
+                "head": node_names[sources[i]],
+                "uberPos": "none",
+                "uberNeg": "none",
+            }
+        )
+        edge_list = pd.concat([edge_list, new_row.to_frame().T], ignore_index=True)
+
+    print(edge_list)
     edge_list.to_excel(file + "_virtual.xlsx")
 
 
@@ -94,8 +110,11 @@ def longest_path(G, GI, v):
             paths = max_paths
         else:
             paths = longest_path_tail(G.copy(), v, seen=max_paths[0], path=max_paths[0])
-    else:
+    elif G.get(v):
         paths = longest_path_tail(G.copy(), v)
+    else:
+        paths = [[v]]
+    pp.pprint(paths)
     return paths
 
 
@@ -139,4 +158,4 @@ def longest_path_head(G, v, seen=None, path=None):
 
 if __name__ == "__main__":
     np.set_printoptions(edgeitems=30, linewidth=100000)
-    add_nodes("data/simple_pd_network_no_sinks")
+    add_nodes("data/simple_pd_network_no_virtual")
