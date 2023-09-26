@@ -11,8 +11,8 @@ if __name__ == "__main__":
         flux=None,
         source_weights=None,
         t_0=0,
-        t=15,
-        num_samples=100,
+        t=500,
+        num_samples=1000,
     )
 
     # The three ways of directly controlling metabolites
@@ -26,4 +26,11 @@ if __name__ == "__main__":
     print(s.mtb)
 
     result = s.simulate()
-    network.basic_plot(result, s, [0, 1, 3, 6, 17, 22, 23, 25])
+    # NOTE: it looks like mis_a_syn_0 diverges but it actually converges to ~8
+    network.basic_plot(result, s, [0, 1, 3, 6, 19, 24, 25, 27], ylim=[0, 10])
+    network.basic_plot(
+        result,
+        s,
+        [0, 1, 2, 3, 4, 5, 6, 7, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 37, 38],
+        ylim=[0, 3],
+    )
