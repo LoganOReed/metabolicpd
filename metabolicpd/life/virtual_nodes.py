@@ -1,4 +1,5 @@
 import pprint
+from collections import defaultdict
 
 import numpy as np
 import pandas as pd
@@ -34,8 +35,7 @@ def add_nodes(file):
                 node_names.append(ele)
     node_names = np.unique(node_names)
     num_nodes = node_names.size
-    # node_idx = dict(zip(node_names, range(num_nodes)))
-    node_adj = {n: [] for n in node_names}
+    node_idx = dict(zip(node_names, range(num_nodes)))
 
     for i in range(num_nodes):
         print(node_names[i])
@@ -46,26 +46,46 @@ def add_nodes(file):
     # Not listing uberedges as it does not impact source/sink locations
     # TODO: is line above true
 
-    # Get list of nodes which are adj to given node
+    G = defaultdict(list)
+
     for row in edge_list[["tail", "head"]].itertuples():
-        t = [i for i in row.tail.split(", ")]
-        h = [i for i in row.head.split(", ")]
+        t = [node_idx[i] for i in row.tail.split(", ")]
+        h = [node_idx[i] for i in row.head.split(", ")]
         for i in t:
-            node_adj[i] = node_adj[i] + h
+            G[i].extend(h)
 
-        pp.pprint(node_adj)
-        print(h)
-        print(t)
-        print(row.Index)
-        print("######")
+    # Build graph dictionary
+    pp.pprint(G)
+    all_paths = DFS(G, 0)
+    max_len = max(len(p) for p in all_paths)
+    max_paths = [p for p in all_paths if len(p) == max_len]
+
+    print("All Paths:")
+    pp.pprint(all_paths)
+    print("Longest Paths:")
+    for p in max_paths:
+        print("  ", p)
+    print("Longest Path Length:")
+    print(max_len)
 
 
-def longest_path_tail(adj, n, visited):
-    """Given a node, find the longest path from that node."""
-    visited[n] = True
-    for i in range(adj.shape[0]):
-        if not visited[i]:
-            pass
+def DFS(G, v, seen=None, path=None):
+    """DFS longest path implementation."""
+    if seen is None:
+        seen = []
+    if path is None:
+        path = [v]
+
+    seen.append(v)
+
+    paths = []
+    for t in G[v]:
+        if t not in seen:
+            t_path = path + [t]
+            if G.get(t) is None:
+                paths.append(tuple(t_path))
+            paths.extend(DFS(G, t, seen[:], t_path))
+    return paths
 
 
 if __name__ == "__main__":
