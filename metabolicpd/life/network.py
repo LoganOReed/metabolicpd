@@ -17,6 +17,7 @@ from metabolicpd.life import util
 # TODO: Look into designing better data file format to read in from and add conversion to "io"
 # TODO: Look into using GraphML as storage
 # TODO: Make flowchart for simulation function calls
+# TODO: Chance virtual nodes so we only have one source and one sink
 class Metabolic_Graph:
     """Implements the pipeline outlined in the associated paper.
 
