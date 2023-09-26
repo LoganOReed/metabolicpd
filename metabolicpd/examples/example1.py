@@ -25,4 +25,4 @@ if __name__ == "__main__":
     s.setInitialValue("clearance_0", 0.0)
 
     result = s.simulate()
-    network.basic_plot(result, s, [0, 1, 3, 6, 17, 22, 23, 25])
+    network.basic_plot(result, s, [0, 1, 3, 6, 7, 17, 22, 23, 25])

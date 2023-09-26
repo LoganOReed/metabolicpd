@@ -177,8 +177,7 @@ class Metabolic_Graph:
 
         self.substrates = []
         # Generate lookup tables for s matrix functions
-        # TODO: Check with Chris that generating this once will not break edge cases
-        # TODO: Check if columns will always be in this order
+        # TODO: Add internal datastructure definition to README
         for row in self.network[["tail", "head", "uberPos", "uberNeg"]].itertuples():
             row_idx = row.Index
             sub_str = self.mtb[np.isin(self.mtb["name"], row.tail.split(", "))]["index"]

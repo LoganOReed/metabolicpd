@@ -21,9 +21,7 @@ pp = pprint.PrettyPrinter(indent=4)
 
 def add_nodes(file):
     """Adds Sources and Sinks to construct a network with a steady state solution."""
-    edge_list = pd.read_excel(file)
-    # TODO: Ask Chris if nodes which are only incident to uberedges exist.
-    # NOTE: Currently only adding sinks
+    edge_list = pd.read_excel(file + ".xlsx")
     edge_list_cells = np.unique(
         edge_list[["tail", "head", "uberPos", "uberNeg"]].values
     )
@@ -39,13 +37,10 @@ def add_nodes(file):
 
     for i in range(num_nodes):
         print(f"{i}: {node_names[i]}")
-    print(num_nodes)
 
     # NOTE: Using a weighted incidence matrix to store info
     # Each integer value corresponds to an edge,
     # Not listing uberedges as it does not impact source/sink locations
-    # TODO: is line above true
-
     G = defaultdict(list)
     GI = defaultdict(list)
 
@@ -57,25 +52,34 @@ def add_nodes(file):
         for i in h:
             GI[i].extend(t)
 
-    # Build graph dictionary
-    print("G: ")
-    pp.pprint(G)
-    print("GI: ")
-    pp.pprint(GI)
-    # for i in GI:
-    #     rev_paths = longest_path_head(GI.copy(), i)
-    #     max_len = max(len(p) for p in rev_paths)
-    #     max_paths = [p for p in rev_paths if len(p) == max_len]
-    #     for j in range(len(max_paths)):
-    #         paths = longest_path_tail(G.copy(), i, seen=max_paths[j], path=max_paths[j])
-    #         print("Paths:")
-    #         pp.pprint(paths)
     paths = []
     for i in range(num_nodes):
-        paths = longest_path(G, GI, i)
-        print(f"Paths: {i}")
-        pp.pprint(paths)
-        print("\n")
+        paths = paths + longest_path(G, GI, i)
+    sources = set()
+    sinks = set()
+    for p in paths:
+        sources.add(p[0])
+        sinks.add(p[-1])
+    sources = list(sources)
+    sinks = list(sinks)
+    print(sources)
+    print(sinks)
+
+    for i in range(len(sinks)):
+        e_name = "e" + str(i)
+        print(f"{e_name} for {node_names[sinks[i]]}")
+        new_row = pd.Series(
+            {
+                "tail": node_names[sinks[i]],
+                "head": e_name,
+                "uberPos": "none",
+                "uberNeg": "none",
+            }
+        )
+        edge_list = pd.concat([edge_list, new_row.to_frame().T], ignore_index=True)
+        print(edge_list)
+
+    edge_list.to_excel(file + "_virtual.xlsx")
 
 
 def longest_path(G, GI, v):
@@ -135,4 +139,4 @@ def longest_path_head(G, v, seen=None, path=None):
 
 if __name__ == "__main__":
     np.set_printoptions(edgeitems=30, linewidth=100000)
-    add_nodes("data/simple_pd_network_no_sinks.xlsx")
+    add_nodes("data/simple_pd_network_no_sinks")
