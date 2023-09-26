@@ -38,7 +38,7 @@ def add_nodes(file):
     node_idx = dict(zip(node_names, range(num_nodes)))
 
     for i in range(num_nodes):
-        print(node_names[i])
+        print(f"{i}: {node_names[i]}")
     print(num_nodes)
 
     # NOTE: Using a weighted incidence matrix to store info
@@ -47,30 +47,56 @@ def add_nodes(file):
     # TODO: is line above true
 
     G = defaultdict(list)
+    GI = defaultdict(list)
 
     for row in edge_list[["tail", "head"]].itertuples():
         t = [node_idx[i] for i in row.tail.split(", ")]
         h = [node_idx[i] for i in row.head.split(", ")]
         for i in t:
             G[i].extend(h)
+        for i in h:
+            GI[i].extend(t)
 
     # Build graph dictionary
+    print("G: ")
     pp.pprint(G)
-    all_paths = DFS(G, 0)
-    max_len = max(len(p) for p in all_paths)
-    max_paths = [p for p in all_paths if len(p) == max_len]
+    print("GI: ")
+    pp.pprint(GI)
+    # for i in GI:
+    #     rev_paths = longest_path_head(GI.copy(), i)
+    #     max_len = max(len(p) for p in rev_paths)
+    #     max_paths = [p for p in rev_paths if len(p) == max_len]
+    #     for j in range(len(max_paths)):
+    #         paths = longest_path_tail(G.copy(), i, seen=max_paths[j], path=max_paths[j])
+    #         print("Paths:")
+    #         pp.pprint(paths)
+    paths = []
+    for i in range(num_nodes):
+        paths = longest_path(G, GI, i)
+        print(f"Paths: {i}")
+        pp.pprint(paths)
+        print("\n")
 
-    print("All Paths:")
-    pp.pprint(all_paths)
-    print("Longest Paths:")
-    for p in max_paths:
-        print("  ", p)
-    print("Longest Path Length:")
-    print(max_len)
+
+def longest_path(G, GI, v):
+    """DFS longest path combining both directions."""
+    if GI.get(v):
+        rev_paths = longest_path_head(GI.copy(), v)
+        max_len = max(len(p) for p in rev_paths)
+        max_paths = [p for p in rev_paths if len(p) == max_len]
+        if not G.get(v):
+            for i in range(len(max_paths)):
+                max_paths[i].append(v)
+            paths = max_paths
+        else:
+            paths = longest_path_tail(G.copy(), v, seen=max_paths[0], path=max_paths[0])
+    else:
+        paths = longest_path_tail(G.copy(), v)
+    return paths
 
 
-def DFS(G, v, seen=None, path=None):
-    """DFS longest path implementation."""
+def longest_path_tail(G, v, seen=None, path=None):
+    """DFS longest path implementation with v as tail."""
     if seen is None:
         seen = []
     if path is None:
@@ -83,8 +109,27 @@ def DFS(G, v, seen=None, path=None):
         if t not in seen:
             t_path = path + [t]
             if G.get(t) is None:
-                paths.append(tuple(t_path))
-            paths.extend(DFS(G, t, seen[:], t_path))
+                paths.append(list(t_path))
+            paths.extend(longest_path_tail(G, t, seen[:], t_path))
+    return paths
+
+
+def longest_path_head(G, v, seen=None, path=None):
+    """DFS longest path implementation with v as head."""
+    if seen is None:
+        seen = []
+    if path is None:
+        path = []
+
+    seen.append(v)
+
+    paths = []
+    for t in G[v]:
+        if t not in seen:
+            t_path = [t] + path
+            if G.get(t) is None:
+                paths.append(list(t_path))
+            paths.extend(longest_path_head(G, t, seen[:], t_path))
     return paths
 
 
