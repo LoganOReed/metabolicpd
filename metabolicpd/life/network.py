@@ -133,9 +133,9 @@ class Metabolic_Graph:
         for ele in new_unique_metabolites:
             # Using regular expression strings to identify source or sink terms in metabolite dictionary keys
             # starts with e, ends with #...
-            sink_res = re.search("^[e]+[0-9]$", ele)
+            sink_res = re.search("^e[0-9]+$", ele)
             # starts with s, end with #...
-            source_res = re.search("^[s]+[0-9]$", ele)
+            source_res = re.search("^s[0-9]+$", ele)
             if (
                 sink_res is not None
             ):  # check if we found something in the entry that matches the format of 'e###'
