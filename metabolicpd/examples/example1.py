@@ -20,8 +20,6 @@ if __name__ == "__main__":
     # 2. fix initial value and force it to be constant
     # 3. set initial value (can also be done in Metabolic_Graph.mass)
     #    doesn't control trajectory
-    s.fixMetabolite("gba_0", 2.5, -np.sin(s.t_eval), isDerivative=True)
-    s.fixMetabolite("a_syn_0", 1.5)
     s.setInitialValue("clearance_0", 0.0)
 
     result = s.simulate()

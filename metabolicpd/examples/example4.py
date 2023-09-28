@@ -6,12 +6,12 @@ from metabolicpd.life import network
 
 if __name__ == "__main__":
     s = network.Metabolic_Graph(
-        file="data/simple_pd_network_no_virtual_virtual.xlsx",
+        file="data/simple_pd_network_no_virtual.xlsx",
         mass=None,  # Makes the masses random via constructor
         flux=None,
         source_weights=None,
         t_0=0,
-        t=500,
+        t=5,
         num_samples=1000,
     )
 
