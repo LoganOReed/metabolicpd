@@ -1,4 +1,3 @@
-import pprint
 from collections import defaultdict
 
 import numpy as np
@@ -15,8 +14,6 @@ import pandas as pd
 # All nodes need to be contained in a path from a source to a sink
 
 # read graph/network from clean file
-
-pp = pprint.PrettyPrinter(indent=4)
 
 
 # TODO: Create way of listing existing nodes as "virtual"
@@ -36,9 +33,6 @@ def add_nodes(file, existing_sources=[], existing_sinks=[]):
     node_names = np.unique(node_names)
     num_nodes = node_names.size
     node_idx = dict(zip(node_names, range(num_nodes)))
-
-    for i in range(num_nodes):
-        print(f"{i}: {node_names[i]}")
 
     # NOTE: Using a weighted incidence matrix to store info
     # Each integer value corresponds to an edge,
@@ -70,9 +64,6 @@ def add_nodes(file, existing_sources=[], existing_sinks=[]):
         sinks.remove(node_idx[e])
     for s in existing_sources:
         sources.remove(node_idx[s])
-
-    print(sources)
-    print(sinks)
 
     # Add sinks
     for i in range(len(sinks)):
@@ -123,7 +114,6 @@ def longest_path(G, GI, v):
         paths = longest_path_tail(G.copy(), v)
     else:
         paths = [[v]]
-    pp.pprint(paths)
     return paths
 
 
