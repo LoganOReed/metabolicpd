@@ -19,6 +19,8 @@ import pandas as pd
 pp = pprint.PrettyPrinter(indent=4)
 
 
+# TODO: Create way of listing existing nodes as "virtual"
+# Specifically for clearance_0 and maybe partially done networks
 def add_nodes(file):
     """Adds Sources and Sinks to construct a network with a steady state solution."""
     edge_list = pd.read_excel(file + ".xlsx")
