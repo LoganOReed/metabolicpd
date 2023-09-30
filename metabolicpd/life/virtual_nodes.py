@@ -21,7 +21,7 @@ pp = pprint.PrettyPrinter(indent=4)
 
 # TODO: Create way of listing existing nodes as "virtual"
 # Specifically for clearance_0 and maybe partially done networks
-def add_nodes(file):
+def add_nodes(file, existing_sources=[], existing_sinks=[]):
     """Adds Sources and Sinks to construct a network with a steady state solution."""
     edge_list = pd.read_excel(file + ".xlsx")
     edge_list_cells = np.unique(
@@ -64,6 +64,13 @@ def add_nodes(file):
         sinks.add(p[-1])
     sources = list(sources)
     sinks = list(sinks)
+
+    # remove existing source/sinks
+    for e in existing_sinks:
+        sinks.remove(node_idx[e])
+    for s in existing_sources:
+        sources.remove(node_idx[s])
+
     print(sources)
     print(sinks)
 
@@ -71,6 +78,7 @@ def add_nodes(file):
     for i in range(len(sinks)):
         e_name = "e" + str(i)
         print(f"{e_name} for {node_names[sinks[i]]}")
+
         new_row = pd.Series(
             {
                 "tail": node_names[sinks[i]],
@@ -80,7 +88,6 @@ def add_nodes(file):
             }
         )
         edge_list = pd.concat([edge_list, new_row.to_frame().T], ignore_index=True)
-        # print(edge_list)
 
     # Add sources
     for i in range(len(sources)):
@@ -160,4 +167,4 @@ def longest_path_head(G, v, seen=None, path=None):
 
 if __name__ == "__main__":
     np.set_printoptions(edgeitems=30, linewidth=100000)
-    add_nodes("data/simple_pd_network_no_virtual")
+    add_nodes("data/simple_pd_network_no_virtual", existing_sinks=["clearance_0"])
