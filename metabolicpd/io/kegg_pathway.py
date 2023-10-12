@@ -21,5 +21,12 @@ if __name__ == "__main__":
     except OSError:
         print("Could not open/read file: ", kgml_path)
         sys.exit(1)
+
+    # print pathway info
+    for g in pathway.genes:
+        print(g)
+    print("####################")
+    for g in pathway.reaction_entries:
+        print(g)
     print(pathway)
     print("#######################")
