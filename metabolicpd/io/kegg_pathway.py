@@ -2,6 +2,7 @@ import os
 import sys
 
 import Bio.KEGG.REST as bp
+import pandas as pd
 from Bio.KEGG.KGML import KGML_parser
 
 # Directory path for kgml files (assumes you run from project root)
@@ -16,8 +17,10 @@ def get_compound_name(cid):
     return bp.kegg_find("compound", cid).read()
 
 
-if __name__ == "__main__":
+def create_network_from_KGML(kegg_id, out_dir="data/kegg"):
     kgml_path = out_dir + "/" + kegg_id + ".xml"
+    cpd_path = out_dir + "/" + kegg_id + "_compounds.csv"
+    res_path = out_dir + "/" + kegg_id + "_network.csv"
     if not os.path.isfile(kgml_path):
         print("Grabbing KGML using API...")
         with open(kgml_path, "w") as f:
@@ -35,20 +38,54 @@ if __name__ == "__main__":
     #         print(g)
 
     # print pathway info
-    cpd = "cpd:C00085 cpd:C05345"
-    for g in pathway.reactions:
-        print(g)
-        for h in g.products:
-            print(h.name)
-    print("####################")
 
-    cpds = []
+    cpd_table = pd.DataFrame()
     for g in pathway.compounds:
-        cpds = cpds + g.name.split()
+        cpds = ""
+        for c in g.name.split():
+            cpds = cpds + c[4:] + ","
+        new_row = pd.Series(
+            {
+                "reaction_id": g.id,
+                "compound_id": cpds[:-1],
+            }
+        )
+        cpd_table = pd.concat([cpd_table, new_row.to_frame().T], ignore_index=True)
+    print(cpd_table)
+    cpd_table.to_csv(cpd_path)
 
-    cpd_path = out_dir + "/" + kegg_id + ".compounds"
-    cpd_file = open(cpd_path, "w")
-    for c in cpds:
-        cpd_file.write(c[4:] + "\n")
+    edge_list = pd.DataFrame()
+    for g in pathway.reactions:
+        t = ""
+        h = ""
+        for i in g.substrates:
+            t = t + str(i.id) + ","
+        for i in g.products:
+            h = h + str(i.id) + ","
 
-    print("#######################")
+        new_row = pd.Series(
+            {
+                "tail": t[:-1],
+                "head": h[:-1],
+                "uberPos": "none",
+                "uberNeg": "none",
+            }
+        )
+        edge_list = pd.concat([edge_list, new_row.to_frame().T], ignore_index=True)
+        if g.type == "reversible":
+            new_row = pd.Series(
+                {
+                    "tail": h[:-1],
+                    "head": t[:-1],
+                    "uberPos": "none",
+                    "uberNeg": "none",
+                }
+            )
+            edge_list = pd.concat([edge_list, new_row.to_frame().T], ignore_index=True)
+    print(edge_list)
+    edge_list.to_csv(res_path)
+    return res_path
+
+
+if __name__ == "__main__":
+    create_network_from_KGML("mtu01200")
