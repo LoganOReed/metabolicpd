@@ -10,7 +10,7 @@ if __name__ == "__main__":
     m = np.random.rand(12) * 3
     f = np.random.default_rng().uniform(0.1, 0.8, 20)
     cctb_network = network.Metabolic_Graph(
-        file="data/central_carbon_tb.xlsx",
+        file="data/central_carbon_tb.csv",
         mass=m,  # Makes the masses random via constructor
         flux=f,
         source_weights=None,

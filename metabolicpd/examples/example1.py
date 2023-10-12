@@ -6,7 +6,7 @@ from metabolicpd.life import network
 
 if __name__ == "__main__":
     s = network.Metabolic_Graph(
-        file="data/simple_pd_network.xlsx",
+        file="data/simple_pd_network.csv",
         mass=None,  # Makes the masses random via constructor
         flux=None,
         source_weights=None,

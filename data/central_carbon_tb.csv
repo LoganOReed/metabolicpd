@@ -1,0 +1,21 @@
+tail,head,uberPos,uberNeg
+s0,glucose,none,none
+glucose,PEP,none,none
+PEP,pyruvate,none,none
+pyruvate,PEP,none,none
+pyruvate,acetyl_CoA,none,none
+oxaloacetate,PEP,none,none
+isocitrate,α_ketoglutarate,none,none
+α_ketoglutarate,isocitrate,none,none
+isocitrate,glyoxylate,none,none
+isocitrate,succinate,none,none
+oxaloacetate,malate,none,none
+α_ketoglutarate,succinate,none,none
+α_ketoglutarate,e0,none,none
+succinate,α_ketoglutarate,none,none
+succinate,malate,none,none
+malate,succinate,none,none
+acetyl_CoA oxaloacetate,isocitrate,none,none
+isocitrate,acetyl_CoA oxaloacetate,none,none
+acetyl_CoA glyoxylate,malate,none,none
+malate,oxaloacetate,none,clofazimine

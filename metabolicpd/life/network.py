@@ -47,7 +47,7 @@ class Metabolic_Graph:
     # TODO: Use pg. 44 in LIFE Approach by Nathaniel Merrill to find basis
     def __init__(
         self,
-        file: Optional[str] = None,
+        file: str = "",
         mass: Optional[np.ndarray[Any, np.dtype[np.float64]]] = None,
         flux: Optional[np.ndarray[Any, np.dtype[np.float64]]] = None,
         ffunc: Optional[
@@ -94,16 +94,19 @@ class Metabolic_Graph:
         self.final_masses = None
 
         # read graph/network from clean file
-        self.network: pd.DataFrame = pd.read_excel(file)
+        self.network: pd.DataFrame = pd.read_csv(file)  # type = ignore
         unique_entries = np.unique(self.network[["tail", "head"]].values)
+        print(unique_entries)
 
         # Gather list of metabolites in network
         metabolites = []
         for entry in unique_entries:
-            elements = entry.split(", ")
+            elements = entry.split(" ")
+            print(elements)
             for ele in elements:
                 metabolites.append(ele)
         new_unique_metabolites = list(dict.fromkeys(metabolites))
+        print(new_unique_metabolites)
         num_mtb = len(new_unique_metabolites)
         # TODO: remove num_edges since its never used
         self._num_edges = self.network.shape[0]
@@ -181,10 +184,8 @@ class Metabolic_Graph:
         # TODO: Add internal datastructure definition to README
         for row in self.network[["tail", "head", "uberPos", "uberNeg"]].itertuples():
             row_idx = row.Index
-            sub_str = self.mtb[np.isin(self.mtb["name"], row.tail.split(", "))]["index"]
-            prod_snk = self.mtb[np.isin(self.mtb["name"], row.head.split(", "))][
-                "index"
-            ]
+            sub_str = self.mtb[np.isin(self.mtb["name"], row.tail.split(" "))]["index"]
+            prod_snk = self.mtb[np.isin(self.mtb["name"], row.head.split(" "))]["index"]
 
             self.substrates.append(sub_str)
 
@@ -198,8 +199,8 @@ class Metabolic_Graph:
                 self.hyper_edges[row_idx, prod_snk] = 1
 
             # Next two loops read in inhibiters(uNeg) and enhancers(uPos)
-            u_p = row.uberPos.split(", ")
-            u_n = row.uberNeg.split(", ")
+            u_p = row.uberPos.split(" ")
+            u_n = row.uberNeg.split(" ")
             for uber in u_p:
                 uber_mods[row.Index, self.mtb[self.mtb["name"] == uber]["index"]] = 1
 

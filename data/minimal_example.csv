@@ -1,0 +1,5 @@
+tail,head,uberPos,uberNeg
+alpha,beta,none,none
+beta,alpha,none,none
+gamma,beta,none,none
+beta,gamma,none,beta

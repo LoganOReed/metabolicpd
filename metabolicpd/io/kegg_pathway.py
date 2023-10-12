@@ -5,12 +5,6 @@ import Bio.KEGG.REST as bp
 import pandas as pd
 from Bio.KEGG.KGML import KGML_parser
 
-# Directory path for kgml files (assumes you run from project root)
-out_dir = "data/kegg"
-# Carbon metabolism - Mycobacterium tuberculosis H37Rv
-kegg_id = "mtu01200"
-# kegg_id = "hsa05165"
-
 
 def get_compound_name(cid):
     """Uses KEGG REST API to convert a kegg compound id (`cpd:C#####` or `C#####`) to a list of names."""
@@ -43,7 +37,7 @@ def create_network_from_KGML(kegg_id, out_dir="data/kegg"):
     for g in pathway.compounds:
         cpds = ""
         for c in g.name.split():
-            cpds = cpds + c[4:] + ","
+            cpds = cpds + c[4:] + " "
         new_row = pd.Series(
             {
                 "reaction_id": g.id,
@@ -51,7 +45,7 @@ def create_network_from_KGML(kegg_id, out_dir="data/kegg"):
             }
         )
         cpd_table = pd.concat([cpd_table, new_row.to_frame().T], ignore_index=True)
-    print(cpd_table)
+    # print(cpd_table)
     cpd_table.to_csv(cpd_path)
 
     edge_list = pd.DataFrame()
@@ -59,9 +53,9 @@ def create_network_from_KGML(kegg_id, out_dir="data/kegg"):
         t = ""
         h = ""
         for i in g.substrates:
-            t = t + str(i.id) + ","
+            t = t + str(i.id) + " "
         for i in g.products:
-            h = h + str(i.id) + ","
+            h = h + str(i.id) + " "
 
         new_row = pd.Series(
             {
@@ -82,10 +76,15 @@ def create_network_from_KGML(kegg_id, out_dir="data/kegg"):
                 }
             )
             edge_list = pd.concat([edge_list, new_row.to_frame().T], ignore_index=True)
-    print(edge_list)
+    # print(edge_list)
     edge_list.to_csv(res_path)
     return res_path
 
 
 if __name__ == "__main__":
-    create_network_from_KGML("mtu01200")
+    # Directory path for kgml files (assumes you run from project root)
+    out_dir = "data/kegg"
+    # Carbon metabolism - Mycobacterium tuberculosis H37Rv
+    kegg_id = "mtu01200"
+    # kegg_id = "hsa05165"
+    create_network_from_KGML(kegg_id)

@@ -14,7 +14,7 @@ if __name__ == "__main__":
             return np.divide(3, 5)
 
     min_network = network.Metabolic_Graph(
-        file="data/minimal_example.xlsx",
+        file="data/minimal_example.csv",
         mass=np.array([3, 2, 5]),
         flux=np.array([1, 3, 3, 2]),
         ffunc=lambda mass, idx: mass[idx],  # type: ignore
