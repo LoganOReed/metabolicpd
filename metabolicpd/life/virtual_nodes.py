@@ -96,7 +96,9 @@ def add_nodes(file, existing_sources=[], existing_sinks=[]):
         edge_list = pd.concat([edge_list, new_row.to_frame().T], ignore_index=True)
 
     print(edge_list)
-    edge_list.to_csv(file[:-4] + "_virtual.csv")
+    res_path = file[:-4] + "_virtual.csv"
+    edge_list.to_csv(res_path)
+    return res_path
 
 
 def longest_path(G, GI, v):

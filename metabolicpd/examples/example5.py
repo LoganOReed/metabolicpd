@@ -2,16 +2,21 @@
 
 # import numpy as np
 
+from metabolicpd.io.kegg_pathway import network_from_KGML
 from metabolicpd.life import network
+from metabolicpd.life.virtual_nodes import add_nodes
 
 if __name__ == "__main__":
+    file = network_from_KGML("mtu01200")
+    file = add_nodes(file)
+
     s = network.Metabolic_Graph(
-        file="data/kegg/mtu01200_network_virtual.csv",
+        file=file,
         mass=None,  # Makes the masses random via constructor
         flux=None,
         source_weights=None,
         t_0=0,
-        t=100,
+        t=10000,
         num_samples=1000,
     )
 
@@ -28,11 +33,11 @@ if __name__ == "__main__":
         result,
         s,
         [i for i in range(54)],
-        ylim=[0, 100],
+        ylim=[0, 1000],
     )
     counter = 0
     for i in result["y"]:
-        if i[-1] > 30.0:
+        if i[-1] > 30.0 and counter < 55:
             print(f"{str(counter)}: {i[-1]}")
         counter = counter + 1
     print(

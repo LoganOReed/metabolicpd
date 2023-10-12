@@ -11,7 +11,7 @@ def get_compound_name(cid):
     return bp.kegg_find("compound", cid).read()
 
 
-def create_network_from_KGML(kegg_id, out_dir="data/kegg"):
+def network_from_KGML(kegg_id, out_dir="data/kegg"):
     kgml_path = out_dir + "/" + kegg_id + ".xml"
     cpd_path = out_dir + "/" + kegg_id + "_compounds.csv"
     res_path = out_dir + "/" + kegg_id + "_network.csv"
@@ -82,9 +82,7 @@ def create_network_from_KGML(kegg_id, out_dir="data/kegg"):
 
 
 if __name__ == "__main__":
-    # Directory path for kgml files (assumes you run from project root)
-    out_dir = "data/kegg"
     # Carbon metabolism - Mycobacterium tuberculosis H37Rv
     kegg_id = "mtu01200"
     # kegg_id = "hsa05165"
-    create_network_from_KGML(kegg_id)
+    network_from_KGML(kegg_id)
