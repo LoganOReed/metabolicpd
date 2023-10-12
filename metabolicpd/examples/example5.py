@@ -16,7 +16,7 @@ if __name__ == "__main__":
         flux=None,
         source_weights=None,
         t_0=0,
-        t=10000,
+        t=250,
         num_samples=1000,
     )
 
@@ -33,7 +33,7 @@ if __name__ == "__main__":
         result,
         s,
         [i for i in range(54)],
-        ylim=[0, 1000],
+        ylim=[0, 40],
     )
     counter = 0
     for i in result["y"]:

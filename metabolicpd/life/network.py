@@ -14,10 +14,9 @@ import seaborn as sns
 from metabolicpd.life import util
 
 
-# TODO: Look into designing better data file format to read in from and add conversion to "io"
-# TODO: Look into using GraphML as storage
 # TODO: Make flowchart for simulation function calls
 # TODO: Chance virtual nodes so we only have one source and one sink
+# TODO: Implement algorithm from phd paper to find suitable flux and source weights.
 class Metabolic_Graph:
     """Implements the pipeline outlined in the associated paper.
 
@@ -215,6 +214,7 @@ class Metabolic_Graph:
 
     # NOTE: I've set this up so ideally it will only be called by the "simulation" function once written
     # TODO: Write Documentation for new member variables, write example use case
+    # TODO: Create tests for S_matrix computation
     def create_S_matrix(self, mass: np.ndarray[Any, np.dtype[np.float64]]):
         """Create the 'S' matrix, representing the dynamics for the network x' = S(x) * f.
 
