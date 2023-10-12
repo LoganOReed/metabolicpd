@@ -118,7 +118,8 @@ class Metabolic_Graph:
             self.mass = mass
 
         if flux is None:
-            self.flux = np.ones(self.network.shape[0])
+            # self.flux = np.ones(self.network.shape[0])
+            self.flux = np.random.rand(self.network.shape[0])
         else:
             self.flux = flux
 
@@ -167,6 +168,7 @@ class Metabolic_Graph:
         if source_weights is None:
             temp_list = []
             for _ in range(num_mtb):
+                # temp_list.append(1)
                 temp_list.append(1)
             self.source_weights = np.array(temp_list)
         else:
@@ -340,8 +342,8 @@ class Metabolic_Graph:
 def basic_plot(
     result: dict[str, list[float]],
     network: Metabolic_Graph,
-    mtb_to_plot: list[int],
-    ylim=[0, 3],
+    mtb_to_plot: list[int] = [],
+    ylim: list[float] = [0, 3],
 ) -> None:
     """Creates a plot showing the metabolites `mtb_to_plot` using Metabolic_Graph data."""
     # Setup different plt backend for kitty term
@@ -351,6 +353,9 @@ def basic_plot(
     sns.set_style("dark")
     sns.color_palette("pastel")
     sns.set_context("talk")
+
+    if mtb_to_plot == []:
+        mtb_to_plot = [i for i in range(network.mtb.size)]
 
     metabolites_to_plot = mtb_to_plot
     mtb_names = network.mtb[metabolites_to_plot]["name"]  # type: ignore

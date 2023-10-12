@@ -1,0 +1,31 @@
+,tail,head,uberPos,uberNeg
+0,mis_a_syn_0,mis_a_syn_1,lamp2_0,none
+1,a_syn_0,a_syn_1,lamp2_0,mutant_a_syn_0
+2,a_syn_0,a_syn_proto_0,lrrk2_0 mutant_a_syn_0 mutant_lrrk2_0,none
+3,lamp2_0,cma_0,none,a_syn_proto_0
+4,a_syn_1,clearance_0,cma_0 gba_0,glucosylceramide_0
+5,mis_a_syn_1,clearance_0,cma_0 gba_0,glucosylceramide_0
+6,a_syn_1,a_syn_2,none,none
+7,a_syn_2,a_syn_proto_1,none,none
+8,scarb2_gba_golgi_0,scarb2_golgi_0,none,a_syn_proto_1
+9,scarb2_golgi_0,scarb2_0 gba_0,none,none
+10,glucosylceramide_0,glucose_0 ceramide_0,gba_0,none
+11,a_syn_proto_0,e0,none,none
+12,a_syn_proto_1,e1,none,none
+13,ceramide_0,e2,none,none
+14,clearance_0,e3,none,none
+15,cma_0,e4,none,none
+16,gba_0,e5,none,none
+17,glucose_0,e6,none,none
+18,lrrk2_0,e7,none,none
+19,mutant_a_syn_0,e8,none,none
+20,mutant_lrrk2_0,e9,none,none
+21,scarb2_0,e10,none,none
+22,s0,a_syn_0,none,none
+23,s1,glucosylceramide_0,none,none
+24,s2,lamp2_0,none,none
+25,s3,lrrk2_0,none,none
+26,s4,mis_a_syn_0,none,none
+27,s5,mutant_a_syn_0,none,none
+28,s6,mutant_lrrk2_0,none,none
+29,s7,scarb2_gba_golgi_0,none,none

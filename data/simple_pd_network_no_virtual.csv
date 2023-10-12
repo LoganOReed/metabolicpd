@@ -1,0 +1,12 @@
+tail,head,uberPos,uberNeg
+mis_a_syn_0,mis_a_syn_1,lamp2_0,none
+a_syn_0,a_syn_1,lamp2_0,mutant_a_syn_0
+a_syn_0,a_syn_proto_0,lrrk2_0 mutant_a_syn_0 mutant_lrrk2_0,none
+lamp2_0,cma_0,none,a_syn_proto_0
+a_syn_1,clearance_0,cma_0 gba_0,glucosylceramide_0
+mis_a_syn_1,clearance_0,cma_0 gba_0,glucosylceramide_0
+a_syn_1,a_syn_2,none,none
+a_syn_2,a_syn_proto_1,none,none
+scarb2_gba_golgi_0,scarb2_golgi_0,none,a_syn_proto_1
+scarb2_golgi_0,scarb2_0 gba_0,none,none
+glucosylceramide_0,glucose_0 ceramide_0,gba_0,none

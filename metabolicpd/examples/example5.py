@@ -6,13 +6,13 @@ from metabolicpd.life import network
 
 if __name__ == "__main__":
     s = network.Metabolic_Graph(
-        file="data/kegg/mtu01200_network.csv",
+        file="data/kegg/mtu01200_network_virtual.csv",
         mass=None,  # Makes the masses random via constructor
         flux=None,
         source_weights=None,
         t_0=0,
-        t=10,
-        num_samples=100,
+        t=100,
+        num_samples=1000,
     )
 
     # The three ways of directly controlling metabolites
@@ -24,10 +24,17 @@ if __name__ == "__main__":
 
     result = s.simulate()
     # NOTE: it looks like mis_a_syn_0 diverges but it actually converges to ~8
-    network.basic_plot(result, s, [0, 1, 3, 6, 19, 24, 25, 27], ylim=[0, 10])
     network.basic_plot(
         result,
         s,
-        [0, 1, 2, 3, 4, 5, 6, 7, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 37, 38],
-        ylim=[0, 3],
+        [i for i in range(54)],
+        ylim=[0, 100],
+    )
+    counter = 0
+    for i in result["y"]:
+        if i[-1] > 30.0:
+            print(f"{str(counter)}: {i[-1]}")
+        counter = counter + 1
+    print(
+        "Note: The reason this doesn't always approach a steady state solution is that we could use fluxes outside of that space"
     )

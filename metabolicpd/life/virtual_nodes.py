@@ -20,13 +20,14 @@ import pandas as pd
 # Specifically for clearance_0 and maybe partially done networks
 def add_nodes(file, existing_sources=[], existing_sinks=[]):
     """Adds Sources and Sinks to construct a network with a steady state solution."""
-    edge_list = pd.read_excel(file + ".xlsx")
+    edge_list = pd.read_csv(file)
+    print(edge_list)
     edge_list_cells = np.unique(
         edge_list[["tail", "head", "uberPos", "uberNeg"]].values
     )
     node_names = []
     for entry in edge_list_cells:
-        elements = entry.split(", ")
+        elements = entry.split(" ")
         for ele in elements:
             if ele != "none":
                 node_names.append(ele)
@@ -41,8 +42,8 @@ def add_nodes(file, existing_sources=[], existing_sinks=[]):
     GI = defaultdict(list)
 
     for row in edge_list[["tail", "head"]].itertuples():
-        t = [node_idx[i] for i in row.tail.split(", ")]
-        h = [node_idx[i] for i in row.head.split(", ")]
+        t = [node_idx[i] for i in row.tail.split(" ")]
+        h = [node_idx[i] for i in row.head.split(" ")]
         for i in t:
             G[i].extend(h)
         for i in h:
@@ -95,7 +96,7 @@ def add_nodes(file, existing_sources=[], existing_sinks=[]):
         edge_list = pd.concat([edge_list, new_row.to_frame().T], ignore_index=True)
 
     print(edge_list)
-    edge_list.to_excel(file + "_virtual.xlsx")
+    edge_list.to_csv(file[:-4] + "_virtual.csv")
 
 
 def longest_path(G, GI, v):
@@ -157,4 +158,5 @@ def longest_path_head(G, v, seen=None, path=None):
 
 if __name__ == "__main__":
     np.set_printoptions(edgeitems=30, linewidth=100000)
-    add_nodes("data/simple_pd_network_no_virtual", existing_sinks=["clearance_0"])
+    # add_nodes("data/kegg/mtu01200_network.csv")
+    add_nodes("data/simple_pd_network_no_virtual.csv")

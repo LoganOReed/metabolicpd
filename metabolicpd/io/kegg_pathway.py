@@ -46,7 +46,7 @@ def create_network_from_KGML(kegg_id, out_dir="data/kegg"):
         )
         cpd_table = pd.concat([cpd_table, new_row.to_frame().T], ignore_index=True)
     # print(cpd_table)
-    cpd_table.to_csv(cpd_path)
+    cpd_table.to_csv(cpd_path, index=False)
 
     edge_list = pd.DataFrame()
     for g in pathway.reactions:
@@ -77,7 +77,7 @@ def create_network_from_KGML(kegg_id, out_dir="data/kegg"):
             )
             edge_list = pd.concat([edge_list, new_row.to_frame().T], ignore_index=True)
     # print(edge_list)
-    edge_list.to_csv(res_path)
+    edge_list.to_csv(res_path, index=False)
     return res_path
 
 
