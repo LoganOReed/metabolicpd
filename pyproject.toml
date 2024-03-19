@@ -16,6 +16,7 @@ sympy = "^1.12"
 scipy = "^1.11.1"
 seaborn = "^0.12.2"
 biopython = "^1.81"
+matplotlib-backend-kitty = "^2.1.2"
 
 
 
